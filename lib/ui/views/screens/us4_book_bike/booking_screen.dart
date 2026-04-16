@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../models/bike_slot.dart';
 import '../../../viewmodels/ride_app_view_model.dart';
-import '../pass_selection_screen.dart';
+import '../us1_select_pass/pass_selection_screen.dart';
 import 'booking_success_screen.dart';
 import 'purchase_ticket_screen.dart';
 import 'view_model/booking_view_model.dart';

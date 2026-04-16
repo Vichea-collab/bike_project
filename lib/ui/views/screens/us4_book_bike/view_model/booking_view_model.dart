@@ -4,10 +4,8 @@ import '../../../../../models/bike_slot.dart';
 import '../../../../viewmodels/ride_app_view_model.dart';
 
 class BookingViewModel extends ChangeNotifier {
-  BookingViewModel({
-    required RideAppViewModel appViewModel,
-    required this.slot,
-  }) : _appViewModel = appViewModel {
+  BookingViewModel({required RideAppViewModel appViewModel, required this.slot})
+    : _appViewModel = appViewModel {
     _appViewModel.addListener(_handleAppStateChanged);
   }
 
