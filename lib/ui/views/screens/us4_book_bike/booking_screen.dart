@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../models/bike_slot.dart';
 import '../../../viewmodels/ride_app_view_model.dart';
-import '../us1_select_pass/pass_selection_screen.dart';
 import 'booking_success_screen.dart';
 import 'purchase_ticket_screen.dart';
 import 'view_model/booking_view_model.dart';
 import 'widgets/booking_content.dart';
+import 'widgets/booking_flow_shared.dart';
 
 class BookingScreen extends StatefulWidget {
   const BookingScreen({super.key, required this.viewModel, required this.slot});
@@ -42,13 +42,15 @@ class _BookingScreenState extends State<BookingScreen> {
       animation: _viewModel,
       builder: (context, _) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF7F4EF),
-          appBar: AppBar(title: const Text('Book a Bike')),
-          body: BookingContent(
-            viewModel: _viewModel,
-            onBuyTicket: _openTicketPurchase,
-            onBuyPass: _openPassSelection,
-            onConfirm: _confirmBooking,
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(title: Text(_viewModel.bookingStepLabel)),
+          body: BookingFlowBackground(
+            child: BookingContent(
+              viewModel: _viewModel,
+              onBuyTicket: _openTicketPurchase,
+              onBuyPass: _openPassSelection,
+              onConfirm: _confirmBooking,
+            ),
           ),
         );
       },
@@ -68,23 +70,18 @@ class _BookingScreenState extends State<BookingScreen> {
       return;
     }
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Single ticket purchased.')));
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   Future<void> _openPassSelection() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text('Select a pass')),
-          body: PassSelectionScreen(
-            viewModel: widget.viewModel,
-            selectionMode: true,
-          ),
-        ),
-      ),
-    );
+    _viewModel.clearActionError();
+    _viewModel.openPassesTab();
+
+    if (!mounted) {
+      return;
+    }
+
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   Future<void> _confirmBooking() async {
@@ -95,20 +92,27 @@ class _BookingScreenState extends State<BookingScreen> {
     }
 
     if (!success) {
+      final bookingState = _viewModel.state;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _viewModel.actionError ?? 'Unable to confirm the booking.',
+            bookingState.actionError ?? 'Unable to confirm the booking.',
           ),
         ),
       );
       return;
     }
 
-    await Navigator.of(context).pushReplacement<bool, bool>(
+    final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) => BookingSuccessScreen(viewModel: _viewModel),
       ),
     );
+
+    if (!mounted || result != true) {
+      return;
+    }
+
+    Navigator.of(context).pop(true);
   }
 }

@@ -20,63 +20,79 @@ class BookingContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final bookingState = viewModel.state;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       children: [
-        Text(
-          'Reserve your bike in three steps: review, unlock access, confirm.',
-          style: theme.textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 18),
         SectionCard(
-          backgroundColor: const Color(0xFFFFFCFA),
-          borderSide: const BorderSide(color: Color(0xFFE8D8CB)),
+          backgroundColor: const Color(0xFFFCFAF7),
+          borderSide: const BorderSide(color: Color(0xFFE8DED4)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _StepBadge(label: 'Step 1 · Review bike'),
-              const SizedBox(height: 16),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFE8DA),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: const Icon(
-                      Icons.pedal_bike_rounded,
-                      color: Color(0xFFD85B18),
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          viewModel.bikeLabel,
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontSize: 26,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Bike is available and ready to reserve.',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: const Color(0xFF7F4A25),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              Text(
+                'Booking Bike',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Check the pickup details.',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: const Color(0xFF655E58),
+                ),
               ),
               const SizedBox(height: 18),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: const Color(0xFFE8DED4)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF6E8DC),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: const Icon(
+                        Icons.pedal_bike_rounded,
+                        color: Color(0xFFC56B2A),
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            viewModel.bikeLabel,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Ready for pickup',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: const Color(0xFF746C65),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
               Row(
                 children: [
                   Expanded(
@@ -96,70 +112,119 @@ class BookingContent extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         SectionCard(
-          backgroundColor: const Color(0xFFFFF4DA),
-          borderSide: const BorderSide(color: Color(0xFFF0DFAB)),
+          backgroundColor: Colors.white,
+          borderSide: const BorderSide(color: Color(0xFFE8DED4)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _StepBadge(label: 'Step 2 · Access'),
-              const SizedBox(height: 16),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: viewModel.canConfirm
-                          ? const Color(0xFFFFE0CC)
-                          : const Color(0xFFFFD18A),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      viewModel.canConfirm
-                          ? Icons.verified_rounded
-                          : Icons.info_outline_rounded,
-                      color: viewModel.canConfirm
-                          ? const Color(0xFFE46F2A)
-                          : const Color(0xFFAB6A00),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           viewModel.accessTitle,
-                          style: theme.textTheme.titleLarge,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         Text(
                           viewModel.accessDescription,
                           style: theme.textTheme.bodyLarge?.copyWith(
-                            color: const Color(0xFF7D663E),
+                            color: const Color(0xFF655E58),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  _StatusChip(
+                    label: viewModel.canConfirm ? 'Ready' : 'Choose one',
+                    backgroundColor: viewModel.canConfirm
+                        ? const Color(0xFFEAF4EC)
+                        : const Color(0xFFF8EFE6),
+                    foregroundColor: viewModel.canConfirm
+                        ? const Color(0xFF2F6A46)
+                        : const Color(0xFF935A2B),
+                  ),
                 ],
               ),
+              const SizedBox(height: 18),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF7F4F0),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: viewModel.canConfirm
+                            ? const Color(0xFFEAF4EC)
+                            : const Color(0xFFF6E8DC),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(
+                        viewModel.canConfirm
+                            ? Icons.verified_rounded
+                            : Icons.lock_open_rounded,
+                        color: viewModel.canConfirm
+                            ? const Color(0xFF2F6A46)
+                            : colors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        viewModel.canConfirm
+                            ? 'Access is active.'
+                            : 'Select a ticket or pass to continue.',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFF5D5650),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
               if (!viewModel.canConfirm) ...[
-                const SizedBox(height: 18),
                 FilledButton(
-                  onPressed: viewModel.isBusy ? null : onBuyTicket,
+                  onPressed: bookingState.isBusy ? null : onBuyTicket,
                   child: const Text('Buy single ticket'),
                 ),
                 const SizedBox(height: 10),
                 OutlinedButton(
-                  onPressed: viewModel.isBusy ? null : onBuyPass,
-                  child: const Text('Go to pass selection'),
+                  onPressed: bookingState.isBusy ? null : onBuyPass,
+                  child: const Text('Choose a pass'),
                 ),
+              ] else ...[
+                FilledButton(
+                  onPressed: bookingState.isBusy ? null : onConfirm,
+                  child: Text(
+                    bookingState.isConfirming
+                        ? 'Finishing reservation...'
+                        : 'Finish reservation',
+                  ),
+                ),
+                if (viewModel.hasActivePass) ...[
+                  const SizedBox(height: 10),
+                  OutlinedButton(
+                    onPressed: bookingState.isBusy ? null : onBuyPass,
+                    child: const Text('Change pass'),
+                  ),
+                ],
               ],
             ],
           ),
         ),
-        if (viewModel.actionError != null) ...[
+        if (bookingState.actionError != null) ...[
           const SizedBox(height: 18),
           Container(
             padding: const EdgeInsets.all(14),
@@ -177,7 +242,7 @@ class BookingContent extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    viewModel.actionError!,
+                    bookingState.actionError!,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: const Color(0xFFA34820),
                     ),
@@ -187,68 +252,7 @@ class BookingContent extends StatelessWidget {
             ),
           ),
         ],
-        const SizedBox(height: 22),
-        SectionCard(
-          backgroundColor: const Color(0xFF2F2A27),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _StepBadge(
-                label: 'Step 3 · Confirm',
-                backgroundColor: Color(0x26FFFFFF),
-                textColor: Colors.white,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Finish the reservation to hold this bike at ${viewModel.stationName}.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.8),
-                ),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: viewModel.canConfirm && !viewModel.isBusy
-                    ? onConfirm
-                    : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFE46F2A),
-                  foregroundColor: Colors.white,
-                ),
-                child: Text(
-                  viewModel.isConfirming ? 'Confirming...' : 'Confirm booking',
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
-    );
-  }
-}
-
-class _StepBadge extends StatelessWidget {
-  const _StepBadge({
-    required this.label,
-    this.backgroundColor = const Color(0xFFFFF1E7),
-    this.textColor = const Color(0xFF8A4B24),
-  });
-
-  final String label;
-  final Color backgroundColor;
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: textColor, fontWeight: FontWeight.w700),
-      ),
     );
   }
 }
@@ -266,9 +270,9 @@ class _InfoPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F3EE),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE6D8CC)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE8DED4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,12 +280,44 @@ class _InfoPill extends StatelessWidget {
           Text(
             label,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: const Color(0xFF756C66),
+              color: const Color(0xFF7A726B),
             ),
           ),
           const SizedBox(height: 4),
-          Text(value, style: theme.textTheme.titleMedium),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({
+    required this.label,
+    required this.backgroundColor,
+    required this.foregroundColor,
+  });
+
+  final String label;
+  final Color backgroundColor;
+  final Color foregroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: foregroundColor, fontWeight: FontWeight.w800),
       ),
     );
   }

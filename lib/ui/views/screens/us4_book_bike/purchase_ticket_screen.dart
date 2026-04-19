@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'booking_success_screen.dart';
 import 'view_model/booking_view_model.dart';
+import 'widgets/booking_flow_shared.dart';
 import 'widgets/purchase_ticket_content.dart';
 
 class PurchaseTicketScreen extends StatelessWidget {
@@ -14,12 +16,14 @@ class PurchaseTicketScreen extends StatelessWidget {
       animation: viewModel,
       builder: (context, _) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF7F4EF),
-          appBar: AppBar(title: const Text('Purchase Ticket')),
-          body: PurchaseTicketContent(
-            viewModel: viewModel,
-            onPay: () => _payTicket(context),
-            onCancel: () => Navigator.of(context).pop(),
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(title: Text(viewModel.purchaseStepLabel)),
+          body: BookingFlowBackground(
+            child: PurchaseTicketContent(
+              viewModel: viewModel,
+              onPay: () => _payTicket(context),
+              onCancel: () => Navigator.of(context).pop(),
+            ),
           ),
         );
       },
@@ -34,16 +38,39 @@ class PurchaseTicketScreen extends StatelessWidget {
     }
 
     if (!purchased) {
+      final bookingState = viewModel.state;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            viewModel.actionError ?? 'Unable to purchase the ticket.',
+            bookingState.actionError ?? 'Unable to purchase the ticket.',
           ),
         ),
       );
       return;
     }
 
-    Navigator.of(context).pop(true);
+    final booked = await viewModel.confirmBooking();
+
+    if (!context.mounted) {
+      return;
+    }
+
+    if (!booked) {
+      final bookingState = viewModel.state;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            bookingState.actionError ?? 'Unable to confirm the booking.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    Navigator.of(context).pushReplacement<bool, bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => BookingSuccessScreen(viewModel: viewModel),
+      ),
+    );
   }
 }
