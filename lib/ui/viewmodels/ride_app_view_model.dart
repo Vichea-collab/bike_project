@@ -69,11 +69,7 @@ class RideAppViewModel extends ChangeNotifier {
       return;
     }
 
-    _setState(
-      _state.copyWith(
-        selectedStation: selectedStation,
-      ),
-    );
+    _setState(_state.copyWith(selectedStation: selectedStation));
     notifyListeners();
   }
 
@@ -83,12 +79,7 @@ class RideAppViewModel extends ChangeNotifier {
   }
 
   void replaceCurrentUser(AppUser? user, {String? errorMessage}) {
-    _setState(
-      _state.copyWith(
-        currentUser: user,
-        errorMessage: errorMessage,
-      ),
-    );
+    _setState(_state.copyWith(currentUser: user, errorMessage: errorMessage));
     notifyListeners();
   }
 
