@@ -15,6 +15,11 @@ class RideAppViewModel extends ChangeNotifier {
   RideRepository get repository => _repository;
   RideAppState get state => _state;
 
+  Future<void> saveUser(AppUser user) async {
+    await _repository.saveCurrentUser(user);
+    replaceCurrentUser(user, errorMessage: null);
+  }
+
   Future<void> initialize() async {
     try {
       _setState(_state.copyWith(isLoading: true, errorMessage: null));
@@ -69,11 +74,7 @@ class RideAppViewModel extends ChangeNotifier {
       return;
     }
 
-    _setState(
-      _state.copyWith(
-        selectedStation: selectedStation,
-      ),
-    );
+    _setState(_state.copyWith(selectedStation: selectedStation));
     notifyListeners();
   }
 
@@ -83,12 +84,7 @@ class RideAppViewModel extends ChangeNotifier {
   }
 
   void replaceCurrentUser(AppUser? user, {String? errorMessage}) {
-    _setState(
-      _state.copyWith(
-        currentUser: user,
-        errorMessage: errorMessage,
-      ),
-    );
+    _setState(_state.copyWith(currentUser: user, errorMessage: errorMessage));
     notifyListeners();
   }
 
