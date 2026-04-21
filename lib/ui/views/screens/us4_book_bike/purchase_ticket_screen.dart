@@ -17,7 +17,7 @@ class PurchaseTicketScreen extends StatelessWidget {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: AppBar(title: Text(viewModel.purchaseStepLabel)),
+          appBar: AppBar(title: const Text('Step 2 of 3')),
           body: BookingFlowBackground(
             child: PurchaseTicketContent(
               viewModel: viewModel,
@@ -31,36 +31,17 @@ class PurchaseTicketScreen extends StatelessWidget {
   }
 
   Future<void> _payTicket(BuildContext context) async {
-    final purchased = await viewModel.purchaseSingleTicket();
-
-    if (!context.mounted) {
-      return;
-    }
-
-    if (!purchased) {
-      final bookingState = viewModel.state;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            bookingState.actionError ?? 'Unable to purchase the ticket.',
-          ),
-        ),
-      );
-      return;
-    }
-
-    final booked = await viewModel.confirmBooking();
+    final booked = await viewModel.paySingleTicketAndConfirmBooking();
 
     if (!context.mounted) {
       return;
     }
 
     if (!booked) {
-      final bookingState = viewModel.state;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            bookingState.actionError ?? 'Unable to confirm the booking.',
+            viewModel.actionError ?? 'Unable to confirm the booking.',
           ),
         ),
       );

@@ -1,12 +1,9 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../../../models/app_user.dart';
 import '../../../../../models/bike_slot.dart';
-import '../../../../../models/booking_history_item.dart';
 import '../../../../utils/date_time_utils.dart';
-import '../../../../viewmodels/ride_app_view_model.dart';
 import '../../../../utils/async_value.dart';
-import '../state/booking_state.dart';
+import '../../../../viewmodels/ride_app_view_model.dart';
 
 class BookingViewModel extends ChangeNotifier {
   BookingViewModel({required RideAppViewModel appViewModel, required this.slot})
@@ -16,27 +13,20 @@ class BookingViewModel extends ChangeNotifier {
 
   final RideAppViewModel _appViewModel;
   final BikeSlot slot;
-  BookingState _state = const BookingState();
+  AsyncValue<void> _state = const AsyncValue.success(null);
 
-  BookingState get state => _state;
-
-  String get bikeLabel => 'Selected bike';
+  AsyncValue<void> get state => _state;
+  bool get isBusy => _state.isLoading;
+  String? get actionError => _state.errorMessage;
 
   String get stationName => _appViewModel.state.selectedStation?.name ?? '-';
   String get slotLabel => slot.label;
   bool get hasActivePass => _appViewModel.state.hasActivePass;
-  bool get hasSingleTicket => _appViewModel.state.hasSingleTicket;
-  bool get canConfirm => hasActivePass || hasSingleTicket;
-  String get bookingStepLabel => hasActivePass ? 'Step 1 of 2' : 'Step 1 of 3';
-  String get purchaseStepLabel => 'Step 2 of 3';
-  String get successStepLabel => hasActivePass ? 'Step 2 of 2' : 'Step 3 of 3';
+  bool get canConfirm => hasActivePass;
 
   String get accessTitle {
     if (hasActivePass) {
       return 'Active pass';
-    }
-    if (hasSingleTicket) {
-      return 'Single ticket ready';
     }
     return 'Choose access';
   }
@@ -49,59 +39,14 @@ class BookingViewModel extends ChangeNotifier {
       }
       return '${pass.type.title} active until ${formatDateLong(pass.expirationDate)}.';
     }
-    if (hasSingleTicket) {
-      return 'Your \$2.00 ticket is ready for this booking.';
-    }
-    return 'Buy one single ticket or choose a pass before confirming this bike.';
+    return 'Buy one single ticket for this reservation or choose a pass for ongoing access.';
   }
 
   void clearActionError() {
-    if (_state.actionError == null) {
+    if (!_state.hasError) {
       return;
     }
-    _setState(
-      _state.copyWith(
-        confirmValue: const AsyncValue.success(null),
-        purchaseTicketValue: const AsyncValue.success(null),
-      ),
-    );
-  }
-
-  Future<bool> purchaseSingleTicket() async {
-    final currentUser = _appViewModel.state.currentUser;
-    if (currentUser == null) {
-      return false;
-    }
-
-    _setState(
-      _state.copyWith(
-        confirmValue: const AsyncValue.success(null),
-        purchaseTicketValue: const AsyncValue.loading(),
-      ),
-    );
-
-    try {
-      final updatedUser = currentUser.copyWith(hasSingleTicket: true);
-      await _appViewModel.repository.saveCurrentUser(updatedUser);
-      _appViewModel.replaceCurrentUser(updatedUser, errorMessage: null);
-      _setState(
-        _state.copyWith(
-          purchaseTicketValue: const AsyncValue.success(null),
-        ),
-      );
-      return true;
-    } catch (_) {
-      _appViewModel.setErrorMessage('Unable to purchase a single ticket.');
-      _setState(
-        _state.copyWith(
-          purchaseTicketValue: AsyncValue.error(
-            _appViewModel.state.errorMessage ??
-                'Unable to purchase the ticket.',
-          ),
-        ),
-      );
-      return false;
-    }
+    _setState(const AsyncValue.success(null));
   }
 
   Future<bool> confirmBooking() async {
@@ -111,73 +56,52 @@ class BookingViewModel extends ChangeNotifier {
       return false;
     }
 
-    _setState(
-      _state.copyWith(
-        confirmValue: const AsyncValue.loading(),
-        purchaseTicketValue: const AsyncValue.success(null),
-      ),
-    );
+    _setState(const AsyncValue.loading());
 
     try {
       _appViewModel.setErrorMessage(null);
-      await _appViewModel.repository.bookBike(
+      await _appViewModel.bookBike(
         stationId: station.id,
         slotId: slot.id,
+        updatedUser: currentUser,
       );
-      final updatedUser = _updatedUserAfterBooking(
-        currentUser: currentUser,
-        stationName: station.name,
-      );
-      await _appViewModel.repository.saveCurrentUser(updatedUser);
-      final refreshedStations = await _appViewModel.repository.fetchStations();
-      _appViewModel.applyStations(refreshedStations, updatedUser: updatedUser);
-      _setState(
-        _state.copyWith(confirmValue: const AsyncValue.success(null)),
-      );
+      _setState(const AsyncValue.success(null));
       return true;
     } catch (_) {
-      _appViewModel.setErrorMessage('Unable to confirm the booking.');
-      _setState(
-        _state.copyWith(
-          confirmValue: AsyncValue.error(
-            _appViewModel.state.errorMessage ??
-                'Unable to confirm the booking.',
-          ),
-        ),
-      );
+      const message = 'Unable to confirm the booking.';
+      _appViewModel.setErrorMessage(message);
+      _setState(AsyncValue.error(message));
       return false;
     }
   }
 
-  AppUser _updatedUserAfterBooking({
-    required AppUser currentUser,
-    required String stationName,
-  }) {
-    final booking = BookingHistoryItem(
-      stationName: stationName,
-      slotLabel: slot.label,
-      bookedAt: DateTime.now(),
-    );
+  Future<bool> paySingleTicketAndConfirmBooking() async {
+    final station = _appViewModel.state.selectedStation;
+    final currentUser = _appViewModel.state.currentUser;
+    if (station == null || currentUser == null) {
+      return false;
+    }
 
-    return currentUser.copyWith(
-      hasSingleTicket: hasActivePass ? currentUser.hasSingleTicket : false,
-      bookingHistory: [booking, ...currentUser.bookingHistory],
-    );
+    _setState(const AsyncValue.loading());
+
+    try {
+      _appViewModel.setErrorMessage(null);
+      await _appViewModel.bookBike(
+        stationId: station.id,
+        slotId: slot.id,
+        updatedUser: currentUser,
+      );
+      _setState(const AsyncValue.success(null));
+      return true;
+    } catch (_) {
+      const message = 'Unable to complete payment and confirm the booking.';
+      _appViewModel.setErrorMessage(message);
+      _setState(AsyncValue.error(message));
+      return false;
+    }
   }
 
-  void openStationsTab() {
-    _appViewModel.changeTab(0);
-  }
-
-  void openPassesTab() {
-    _appViewModel.changeTab(1);
-  }
-
-  void openHistoryTab() {
-    _appViewModel.changeTab(2);
-  }
-
-  void _setState(BookingState nextState) {
+  void _setState(AsyncValue<void> nextState) {
     _state = nextState;
     notifyListeners();
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../widgets/custom_badge.dart';
+import '../../../widgets/custom_button.dart';
 import '../../../widgets/section_card.dart';
 import '../view_model/booking_view_model.dart';
 
@@ -20,8 +22,6 @@ class BookingContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final bookingState = viewModel.state;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -74,7 +74,7 @@ class BookingContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            viewModel.bikeLabel,
+                            'Selected bike',
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w800,
                             ),
@@ -141,12 +141,12 @@ class BookingContent extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  _StatusChip(
-                    label: viewModel.canConfirm ? 'Ready' : 'Choose one',
+                  CustomBadge(
+                    text: viewModel.canConfirm ? 'Ready' : 'Choose one',
                     backgroundColor: viewModel.canConfirm
                         ? const Color(0xFFEAF4EC)
                         : const Color(0xFFF8EFE6),
-                    foregroundColor: viewModel.canConfirm
+                    textColor: viewModel.canConfirm
                         ? const Color(0xFF2F6A46)
                         : const Color(0xFF935A2B),
                   ),
@@ -176,7 +176,7 @@ class BookingContent extends StatelessWidget {
                             : Icons.lock_open_rounded,
                         color: viewModel.canConfirm
                             ? const Color(0xFF2F6A46)
-                            : colors.primary,
+                            : theme.colorScheme.primary,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -184,7 +184,7 @@ class BookingContent extends StatelessWidget {
                       child: Text(
                         viewModel.canConfirm
                             ? 'Access is active.'
-                            : 'Select a ticket or pass to continue.',
+                            : 'Pay for this ride or choose a pass to continue.',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: const Color(0xFF5D5650),
                         ),
@@ -195,36 +195,36 @@ class BookingContent extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               if (!viewModel.canConfirm) ...[
-                FilledButton(
-                  onPressed: bookingState.isBusy ? null : onBuyTicket,
-                  child: const Text('Buy single ticket'),
+                PrimaryButton(
+                  onPressed: onBuyTicket,
+                  text: 'Pay \$2.00 for this ride',
+                  isLoading: viewModel.isBusy,
                 ),
                 const SizedBox(height: 10),
-                OutlinedButton(
-                  onPressed: bookingState.isBusy ? null : onBuyPass,
-                  child: const Text('Choose a pass'),
+                SecondaryButton(
+                  onPressed: onBuyPass,
+                  text: 'Choose a pass',
+                  isLoading: viewModel.isBusy,
                 ),
               ] else ...[
-                FilledButton(
-                  onPressed: bookingState.isBusy ? null : onConfirm,
-                  child: Text(
-                    bookingState.isConfirming
-                        ? 'Finishing reservation...'
-                        : 'Finish reservation',
-                  ),
+                PrimaryButton(
+                  onPressed: onConfirm,
+                  text: 'Finish reservation',
+                  isLoading: viewModel.isBusy,
                 ),
                 if (viewModel.hasActivePass) ...[
                   const SizedBox(height: 10),
-                  OutlinedButton(
-                    onPressed: bookingState.isBusy ? null : onBuyPass,
-                    child: const Text('Change pass'),
+                  SecondaryButton(
+                    onPressed: onBuyPass,
+                    text: 'Change pass',
+                    isLoading: viewModel.isBusy,
                   ),
                 ],
               ],
             ],
           ),
         ),
-        if (bookingState.actionError != null) ...[
+        if (viewModel.actionError != null) ...[
           const SizedBox(height: 18),
           Container(
             padding: const EdgeInsets.all(14),
@@ -242,7 +242,7 @@ class BookingContent extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    bookingState.actionError!,
+                    viewModel.actionError!,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: const Color(0xFFA34820),
                     ),
@@ -291,33 +291,6 @@ class _InfoPill extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({
-    required this.label,
-    required this.backgroundColor,
-    required this.foregroundColor,
-  });
-
-  final String label;
-  final Color backgroundColor;
-  final Color foregroundColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: foregroundColor, fontWeight: FontWeight.w800),
       ),
     );
   }

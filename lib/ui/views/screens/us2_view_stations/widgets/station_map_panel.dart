@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../models/bike_station.dart';
 import '../../../widgets/custom_badge.dart';
 
-class StationMapPanel extends StatefulWidget {
+class StationMapPanel extends StatelessWidget {
   const StationMapPanel({
     super.key,
     required this.stations,
@@ -30,47 +30,13 @@ class StationMapPanel extends StatefulWidget {
   final bool showSelectedStationCard;
 
   @override
-  State<StationMapPanel> createState() => _StationMapPanelState();
-}
-
-class _StationMapPanelState extends State<StationMapPanel> {
-  late final TransformationController _transformationController;
-
-  @override
-  void initState() {
-    super.initState();
-    _transformationController = TransformationController();
-  }
-
-  @override
-  void dispose() {
-    _transformationController.dispose();
-    super.dispose();
-  }
-
-  void _zoom(double factor) {
-    final currentMatrix = _transformationController.value.clone();
-    final currentScale = currentMatrix.getMaxScaleOnAxis();
-    final targetScale = (currentScale * factor).clamp(1.0, 2.4);
-    final normalizedFactor = targetScale / currentScale;
-    currentMatrix.multiply(
-      Matrix4.diagonal3Values(normalizedFactor, normalizedFactor, 1),
-    );
-    _transformationController.value = currentMatrix;
-  }
-
-  void _resetView() {
-    _transformationController.value = Matrix4.identity();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     BikeStation? selectedStation;
 
-    if (widget.selectedStationId != null) {
-      for (final station in widget.stations) {
-        if (station.id == widget.selectedStationId) {
+    if (selectedStationId != null) {
+      for (final station in stations) {
+        if (station.id == selectedStationId) {
           selectedStation = station;
           break;
         }
@@ -80,8 +46,8 @@ class _StationMapPanelState extends State<StationMapPanel> {
     final map = Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(widget.fullScreen ? 0 : 30),
-        boxShadow: widget.fullScreen
+        borderRadius: BorderRadius.circular(fullScreen ? 0 : 30),
+        boxShadow: fullScreen
             ? null
             : [
                 BoxShadow(
@@ -92,71 +58,53 @@ class _StationMapPanelState extends State<StationMapPanel> {
               ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(widget.fullScreen ? 0 : 14),
+        padding: EdgeInsets.all(fullScreen ? 0 : 14),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final reservedBottomSpace = widget.showSelectedStationCard
-                ? 150.0
-                : 70.0;
-            final mapWidth = math.max(
-              constraints.maxWidth * 1.45,
-              constraints.maxWidth + 220,
-            );
-            final mapHeight = math.max(
-              constraints.maxHeight * 1.28,
-              constraints.maxHeight + reservedBottomSpace,
-            );
+            final reservedBottomSpace = showSelectedStationCard ? 150.0 : 70.0;
+            final mapWidth = constraints.maxWidth;
+            final mapHeight = constraints.maxHeight;
 
             return Stack(
               children: [
                 Positioned.fill(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                      widget.fullScreen ? 0 : 24,
-                    ),
-                    child: InteractiveViewer(
-                      transformationController: _transformationController,
-                      boundaryMargin: const EdgeInsets.all(180),
-                      constrained: false,
-                      minScale: 1,
-                      maxScale: 2.4,
-                      child: SizedBox(
-                        width: mapWidth,
-                        height: mapHeight,
-                        child: Stack(
-                          children: [
-                            Positioned.fill(
-                              child: Container(
-                                color: const Color(0xFFF3F2F0),
-                                child: CustomPaint(
-                                  size: Size(mapWidth, mapHeight),
-                                  painter: _MapBackdropPainter(),
-                                ),
+                    borderRadius: BorderRadius.circular(fullScreen ? 0 : 24),
+                    child: SizedBox(
+                      width: mapWidth,
+                      height: mapHeight,
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: Container(
+                              color: const Color(0xFFF3F2F0),
+                              child: CustomPaint(
+                                size: Size(mapWidth, mapHeight),
+                                painter: _MapBackdropPainter(),
                               ),
                             ),
-                            for (final station in widget.stations)
-                              Positioned(
-                                left: station.mapX * (mapWidth - 72),
-                                top:
-                                    station.mapY *
-                                    (mapHeight - reservedBottomSpace),
-                                child: _StationMarker(
-                                  station: station,
-                                  isSelected:
-                                      widget.selectedStationId == station.id,
-                                  onTap: () => widget.onSelect(station.id),
-                                ),
+                          ),
+                          for (final station in stations)
+                            Positioned(
+                              left: station.mapX * (mapWidth - 72),
+                              top:
+                                  station.mapY *
+                                  (mapHeight - reservedBottomSpace),
+                              child: _StationMarker(
+                                station: station,
+                                isSelected: selectedStationId == station.id,
+                                onTap: () => onSelect(station.id),
                               ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
                 ),
                 Positioned(
-                  top: widget.fullScreen ? 14 : 8,
-                  left: widget.fullScreen ? 14 : 8,
-                  right: widget.fullScreen ? 14 : 8,
+                  top: fullScreen ? 14 : 8,
+                  left: fullScreen ? 14 : 8,
+                  right: fullScreen ? 14 : 8,
                   child: Row(
                     children: [
                       Expanded(
@@ -174,8 +122,8 @@ class _StationMapPanelState extends State<StationMapPanel> {
                             ],
                           ),
                           child: TextField(
-                            controller: widget.searchController,
-                            onChanged: widget.onSearchChanged,
+                            controller: searchController,
+                            onChanged: onSearchChanged,
                             textInputAction: TextInputAction.search,
                             decoration: InputDecoration(
                               hintText: 'Search stations',
@@ -186,10 +134,10 @@ class _StationMapPanelState extends State<StationMapPanel> {
                                 Icons.search_rounded,
                                 color: Color(0xFF8A817B),
                               ),
-                              suffixIcon: widget.searchController.text.isEmpty
+                              suffixIcon: searchController.text.isEmpty
                                   ? null
                                   : IconButton(
-                                      onPressed: widget.onClearSearch,
+                                      onPressed: onClearSearch,
                                       icon: const Icon(
                                         Icons.close_rounded,
                                         color: Color(0xFF8A817B),
@@ -207,24 +155,7 @@ class _StationMapPanelState extends State<StationMapPanel> {
                     ],
                   ),
                 ),
-                Positioned(
-                  right: widget.fullScreen ? 14 : 10,
-                  bottom: widget.showSelectedStationCard ? 112 : 24,
-                  child: Column(
-                    children: [
-                      _MapControlButton(
-                        icon: Icons.add_rounded,
-                        onTap: () => _zoom(1.18),
-                      ),
-                      const SizedBox(height: 10),
-                      _MapControlButton(
-                        icon: Icons.my_location_rounded,
-                        onTap: _resetView,
-                      ),
-                    ],
-                  ),
-                ),
-                if (selectedStation != null && widget.showSelectedStationCard)
+                if (selectedStation != null && showSelectedStationCard)
                   Positioned(
                     left: 8,
                     right: 8,
@@ -299,7 +230,7 @@ class _StationMapPanelState extends State<StationMapPanel> {
       ),
     );
 
-    if (widget.fullScreen) {
+    if (fullScreen) {
       return map;
     }
 
@@ -487,28 +418,4 @@ class _MapBackdropPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _MapControlButton extends StatelessWidget {
-  const _MapControlButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: SizedBox(
-          width: 44,
-          height: 44,
-          child: Icon(icon, color: const Color(0xFF5F5853)),
-        ),
-      ),
-    );
-  }
 }

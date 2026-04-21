@@ -16,6 +16,8 @@ class BikesScreen extends StatelessWidget {
     final appState = viewModel.state;
     final station = appState.selectedStation;
     final theme = Theme.of(context);
+    final availableSlots =
+        station?.slots.where((s) => s.isAvailable).toList() ?? [];
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -81,8 +83,8 @@ class BikesScreen extends StatelessWidget {
                             ),
                             _MetaBadge(
                               icon: Icons.inventory_2_outlined,
-                              value: '${station.totalSlots}',
-                              label: 'total slots',
+                              value: '${station.availableSlots}',
+                              label: 'available',
                               accent: const Color(0xFF8A817B),
                             ),
                           ],
@@ -103,13 +105,38 @@ class BikesScreen extends StatelessWidget {
                     style: theme.textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 14),
-                  for (final slot in station.slots) ...[
-                    BikeSlotTile(
-                      slot: slot,
-                      onTap: slot.isAvailable ? () => onBookBike(slot) : null,
-                    ),
-                    const SizedBox(height: 12),
-                  ],
+                  if (availableSlots.isEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: const Color(0xFFE8DED4)),
+                      ),
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.info_outline_rounded,
+                            size: 30,
+                            color: Color(0xFF9A8E84),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'No bikes available right now.',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    for (final slot in availableSlots) ...[
+                      BikeSlotTile(slot: slot, onTap: () => onBookBike(slot)),
+                      const SizedBox(height: 12),
+                    ],
                 ],
               ),
       ),

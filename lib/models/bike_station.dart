@@ -19,6 +19,7 @@ class BikeStation {
 
   int get availableBikes => slots.where((slot) => slot.isAvailable).length;
   int get totalSlots => slots.length;
+  int get availableSlots => totalSlots - availableBikes;
 
   BikeStation copyWith({
     String? id,
