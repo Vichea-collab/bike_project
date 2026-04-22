@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../theme/app_design_tokens.dart';
+import '../../../widgets/app_icon_tile.dart';
+import '../../../widgets/app_section_header.dart';
 import '../../../widgets/custom_badge.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/section_card.dart';
@@ -24,49 +27,34 @@ class BookingContent extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+      padding: AppSpacing.screenPaddingWide,
       children: [
         SectionCard(
-          backgroundColor: const Color(0xFFFCFAF7),
-          borderSide: const BorderSide(color: Color(0xFFE8DED4)),
+          backgroundColor: AppColors.panelSurface,
+          borderSide: const BorderSide(color: AppColors.panelBorder),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Booking Bike',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Check the pickup details.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: const Color(0xFF655E58),
-                ),
+              const AppSectionHeader(
+                title: 'Booking Bike',
+                subtitle: 'Check the pickup details.',
               ),
               const SizedBox(height: 18),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: const Color(0xFFE8DED4)),
+                  border: Border.all(color: AppColors.panelBorder),
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF6E8DC),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: const Icon(
-                        Icons.pedal_bike_rounded,
-                        color: Color(0xFFC56B2A),
-                        size: 28,
-                      ),
+                    const AppIconTile(
+                      icon: Icons.pedal_bike_rounded,
+                      iconColor: AppColors.accentStrong,
+                      backgroundColor: Color(0xFFF6E8DC),
+                      size: 56,
+                      iconSize: 28,
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -113,77 +101,44 @@ class BookingContent extends StatelessWidget {
         const SizedBox(height: 18),
         SectionCard(
           backgroundColor: Colors.white,
-          borderSide: const BorderSide(color: Color(0xFFE8DED4)),
+          borderSide: const BorderSide(color: AppColors.panelBorder),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          viewModel.accessTitle,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          viewModel.accessDescription,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: const Color(0xFF655E58),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  CustomBadge(
-                    text: viewModel.canConfirm ? 'Ready' : 'Choose one',
-                    backgroundColor: viewModel.canConfirm
-                        ? const Color(0xFFEAF4EC)
-                        : const Color(0xFFF8EFE6),
-                    textColor: viewModel.canConfirm
-                        ? const Color(0xFF2F6A46)
-                        : const Color(0xFF935A2B),
-                  ),
-                ],
+              AppSectionHeader(
+                title: viewModel.accessTitle,
+                trailing: viewModel.canConfirm
+                    ? const CustomBadge.success(text: 'Ready')
+                    : const CustomBadge.warning(text: 'Choose one'),
               ),
               const SizedBox(height: 18),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7F4F0),
-                  borderRadius: BorderRadius.circular(20),
+                  color: AppColors.softSurface,
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: viewModel.canConfirm
-                            ? const Color(0xFFEAF4EC)
-                            : const Color(0xFFF6E8DC),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(
-                        viewModel.canConfirm
-                            ? Icons.verified_rounded
-                            : Icons.lock_open_rounded,
-                        color: viewModel.canConfirm
-                            ? const Color(0xFF2F6A46)
-                            : theme.colorScheme.primary,
-                      ),
+                    AppIconTile(
+                      icon: viewModel.canConfirm
+                          ? Icons.verified_rounded
+                          : Icons.lock_open_rounded,
+                      backgroundColor: viewModel.canConfirm
+                          ? AppColors.successSurface
+                          : const Color(0xFFF6E8DC),
+                      iconColor: viewModel.canConfirm
+                          ? AppColors.success
+                          : theme.colorScheme.primary,
+                      size: 46,
+                      iconSize: 24,
+                      borderRadius: AppRadius.md,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Text(
                         viewModel.canConfirm
-                            ? 'Access is active.'
+                            ? viewModel.accessDescription
                             : 'Pay for this ride or choose a pass to continue.',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: const Color(0xFF5D5650),
@@ -229,16 +184,13 @@ class BookingContent extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFEFEA),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFF2C1B1)),
+              color: AppColors.errorSurface,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: AppColors.errorBorder),
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.error_outline_rounded,
-                  color: Color(0xFFD05C2A),
-                ),
+                const Icon(Icons.error_outline_rounded, color: AppColors.error),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -271,8 +223,8 @@ class _InfoPill extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE8DED4)),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: AppColors.panelBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

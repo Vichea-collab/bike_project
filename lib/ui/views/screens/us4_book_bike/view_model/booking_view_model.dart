@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../../../models/bike_slot.dart';
+import '../../../../../models/current_booking.dart';
 import '../../../../utils/date_time_utils.dart';
 import '../../../../utils/async_value.dart';
 import '../../../../viewmodels/ride_app_view_model.dart';
@@ -50,32 +51,19 @@ class BookingViewModel extends ChangeNotifier {
   }
 
   Future<bool> confirmBooking() async {
-    final station = _appViewModel.state.selectedStation;
-    final currentUser = _appViewModel.state.currentUser;
-    if (station == null || currentUser == null || !canConfirm) {
+    if (!canConfirm) {
       return false;
     }
-
-    _setState(const AsyncValue.loading());
-
-    try {
-      _appViewModel.setErrorMessage(null);
-      await _appViewModel.bookBike(
-        stationId: station.id,
-        slotId: slot.id,
-        updatedUser: currentUser,
-      );
-      _setState(const AsyncValue.success(null));
-      return true;
-    } catch (_) {
-      const message = 'Unable to confirm the booking.';
-      _appViewModel.setErrorMessage(message);
-      _setState(AsyncValue.error(message));
-      return false;
-    }
+    return _completeBooking('Unable to confirm the booking.');
   }
 
   Future<bool> paySingleTicketAndConfirmBooking() async {
+    return _completeBooking(
+      'Unable to complete payment and confirm the booking.',
+    );
+  }
+
+  Future<bool> _completeBooking(String failureMessage) async {
     final station = _appViewModel.state.selectedStation;
     final currentUser = _appViewModel.state.currentUser;
     if (station == null || currentUser == null) {
@@ -86,19 +74,31 @@ class BookingViewModel extends ChangeNotifier {
 
     try {
       _appViewModel.setErrorMessage(null);
+      final updatedUser = currentUser.copyWith(
+        currentBooking: _buildCurrentBooking(station),
+      );
       await _appViewModel.bookBike(
         stationId: station.id,
         slotId: slot.id,
-        updatedUser: currentUser,
+        updatedUser: updatedUser,
       );
       _setState(const AsyncValue.success(null));
       return true;
     } catch (_) {
-      const message = 'Unable to complete payment and confirm the booking.';
-      _appViewModel.setErrorMessage(message);
-      _setState(AsyncValue.error(message));
+      _appViewModel.setErrorMessage(failureMessage);
+      _setState(AsyncValue.error(failureMessage));
       return false;
     }
+  }
+
+  CurrentBooking _buildCurrentBooking(dynamic station) {
+    return CurrentBooking(
+      stationId: station.id,
+      stationName: station.name,
+      slotId: slot.id,
+      slotLabel: slot.label,
+      bookedAt: DateTime.now(),
+    );
   }
 
   void _setState(AsyncValue<void> nextState) {

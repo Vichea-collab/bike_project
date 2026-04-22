@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../theme/app_design_tokens.dart';
+import '../../../widgets/app_section_header.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/section_card.dart';
 import 'booking_flow_shared.dart';
@@ -9,11 +11,11 @@ class BookingSuccessContent extends StatelessWidget {
   const BookingSuccessContent({
     super.key,
     required this.viewModel,
-    required this.onOpenStations,
+    required this.onOpenStation,
   });
 
   final BookingViewModel viewModel;
-  final VoidCallback onOpenStations;
+  final VoidCallback onOpenStation;
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +23,16 @@ class BookingSuccessContent extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: AppSpacing.screenPadding,
         child: SectionCard(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
-          backgroundColor: const Color(0xFFFCFAF7),
-          borderSide: const BorderSide(color: Color(0xFFE8DED4)),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.xxl,
+            28,
+            AppSpacing.xxl,
+            AppSpacing.xxl,
+          ),
+          backgroundColor: AppColors.panelSurface,
+          borderSide: const BorderSide(color: AppColors.panelBorder),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,31 +43,26 @@ class BookingSuccessContent extends StatelessWidget {
                   width: 88,
                   height: 88,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFEAF4EC),
+                    color: AppColors.successSurface,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.check_rounded,
                     size: 46,
-                    color: Color(0xFF2F6A46),
+                    color: AppColors.success,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
               Center(
-                child: Text(
-                  'Reservation complete',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall?.copyWith(fontSize: 28),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Center(
-                child: Text(
-                  'Your bike is now reserved and ready for pickup.',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: const Color(0xFF655E58),
+                child: AppSectionHeader(
+                  title: 'Reservation complete',
+                  subtitle: 'Your bike is now reserved and ready for pickup.',
+                  titleStyle: theme.textTheme.headlineSmall?.copyWith(
+                    fontSize: 28,
+                  ),
+                  subtitleStyle: theme.textTheme.bodyLarge?.copyWith(
+                    color: AppColors.subduedText,
                   ),
                 ),
               ),
@@ -70,8 +72,8 @@ class BookingSuccessContent extends StatelessWidget {
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFE8DED4)),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
+                  border: Border.all(color: AppColors.panelBorder),
                 ),
                 child: Column(
                   children: [
@@ -88,13 +90,13 @@ class BookingSuccessContent extends StatelessWidget {
                     const BookingFlowDetailRow(
                       label: 'Status',
                       value: 'Ready for pickup',
-                      valueColor: Color(0xFF2F6A46),
+                      valueColor: AppColors.success,
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 22),
-              PrimaryButton(onPressed: onOpenStations, text: 'Go to stations'),
+              PrimaryButton(onPressed: onOpenStation, text: 'View station'),
             ],
           ),
         ),

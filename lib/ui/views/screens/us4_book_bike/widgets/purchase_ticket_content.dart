@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../theme/app_design_tokens.dart';
+import '../../../widgets/app_icon_tile.dart';
+import '../../../widgets/app_section_header.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/section_card.dart';
 import 'booking_flow_shared.dart';
@@ -22,37 +25,29 @@ class PurchaseTicketContent extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      padding: AppSpacing.screenPaddingWide,
       child: Column(
         children: [
           Expanded(
             child: SectionCard(
-              backgroundColor: const Color(0xFFFCFAF7),
-              borderRadius: 24,
-              borderSide: const BorderSide(color: Color(0xFFE8DED4)),
+              backgroundColor: AppColors.panelSurface,
+              borderRadius: AppRadius.xxl,
+              borderSide: const BorderSide(color: AppColors.panelBorder),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Payment summary',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'For ${viewModel.stationName}, slot ${viewModel.slotLabel}.',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: const Color(0xFF655E58),
-                    ),
+                  AppSectionHeader(
+                    title: 'Payment summary',
+                    subtitle:
+                        'For ${viewModel.stationName}, slot ${viewModel.slotLabel}.',
                   ),
                   const SizedBox(height: 18),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFE8DED4)),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
+                      border: Border.all(color: AppColors.panelBorder),
                     ),
                     child: Column(
                       children: [
@@ -85,25 +80,21 @@ class PurchaseTicketContent extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF7F4F0),
-                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.softSurface,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF6E8DC),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Icon(
-                            Icons.receipt_long_rounded,
-                            color: Color(0xFFC56B2A),
-                          ),
+                        const AppIconTile(
+                          icon: Icons.receipt_long_rounded,
+                          iconColor: AppColors.accentStrong,
+                          backgroundColor: Color(0xFFF6E8DC),
+                          size: 42,
+                          iconSize: 22,
+                          borderRadius: AppRadius.sm,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Text(
                             'Payment applies only to this reservation and completes the booking immediately.',
@@ -120,7 +111,7 @@ class PurchaseTicketContent extends StatelessWidget {
                     Text(
                       viewModel.actionError!,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFFD05C2A),
+                        color: AppColors.error,
                       ),
                     ),
                   ],

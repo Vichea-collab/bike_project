@@ -21,7 +21,7 @@ class BookingSuccessScreen extends StatelessWidget {
       body: BookingFlowBackground(
         child: BookingSuccessContent(
           viewModel: viewModel,
-          onOpenStations: () {
+          onOpenStation: () {
             context.read<RideAppViewModel>().changeTab(0);
             Navigator.of(context).pop(true);
           },

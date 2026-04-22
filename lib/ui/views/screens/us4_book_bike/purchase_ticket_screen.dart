@@ -48,10 +48,16 @@ class PurchaseTicketScreen extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context).pushReplacement<bool, bool>(
+    final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) => BookingSuccessScreen(viewModel: viewModel),
       ),
     );
+
+    if (!context.mounted || result != true) {
+      return;
+    }
+
+    Navigator.of(context).pop(true);
   }
 }
