@@ -24,7 +24,7 @@ class AppShellScreen extends StatelessWidget {
     if (appState.isLoading) {
       return const Scaffold(
         body: AppStateView.loading(
-          title: 'Loading RideFlow',
+          title: 'Loading BikeRental',
           message: 'Getting stations and account details ready.',
         ),
       );
@@ -194,7 +194,7 @@ String buildAppShellHeaderTitle(int index) {
     case 1:
       return 'Passes';
     default:
-      return 'RideFlow';
+      return 'BikeRental';
   }
 }
 

@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 
 import '../../../models/bike_station.dart';
 import '../../dtos/bike_station_dto.dart';
-import '../../mockup_data.dart';
+
+export 'bike_station_mock_repository.dart';
 
 abstract class BikeStationRepository {
   Future<List<BikeStation>> fetchStations();
@@ -61,20 +62,4 @@ class BikeStationRestRepository implements BikeStationRepository {
       const Duration(seconds: 5),
     ).asyncMap((_) => fetchStations());
   }
-}
-
-class BikeStationMockRepository implements BikeStationRepository {
-  const BikeStationMockRepository({required MockRideStore store})
-    : _store = store;
-
-  final MockRideStore _store;
-
-  @override
-  Future<List<BikeStation>> fetchStations() async {
-    await Future<void>.delayed(const Duration(milliseconds: 250));
-    return List<BikeStation>.from(_store.stations);
-  }
-
-  @override
-  Stream<List<BikeStation>> watchStations() => _store.stationsStream;
 }

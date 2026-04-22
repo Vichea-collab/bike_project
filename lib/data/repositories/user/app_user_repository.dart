@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 
 import '../../../models/app_user.dart';
 import '../../dtos/app_user_dto.dart';
-import '../../mockup_data.dart';
+
+export 'app_user_mock_repository.dart';
 
 abstract class AppUserRepository {
   Future<AppUser> fetchCurrentUser();
@@ -54,23 +55,5 @@ class AppUserRestRepository implements AppUserRepository {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception('Unable to save the current user.');
     }
-  }
-}
-
-class AppUserMockRepository implements AppUserRepository {
-  const AppUserMockRepository({required MockRideStore store}) : _store = store;
-
-  final MockRideStore _store;
-
-  @override
-  Future<AppUser> fetchCurrentUser() async {
-    await Future<void>.delayed(const Duration(milliseconds: 150));
-    return _store.currentUser;
-  }
-
-  @override
-  Future<void> saveCurrentUser(AppUser user) async {
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    _store.currentUser = user;
   }
 }

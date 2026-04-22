@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../../mockup_data.dart';
+export 'bike_slot_mock_repository.dart';
 
 abstract class BikeSlotRepository {
   Future<void> bookBike({required String stationId, required String slotId});
@@ -63,36 +63,5 @@ class BikeSlotRestRepository implements BikeSlotRepository {
     if (putResponse.statusCode < 200 || putResponse.statusCode >= 300) {
       throw Exception('Unable to confirm the booking.');
     }
-  }
-}
-
-class BikeSlotMockRepository implements BikeSlotRepository {
-  const BikeSlotMockRepository({required MockRideStore store}) : _store = store;
-
-  final MockRideStore _store;
-
-  @override
-  Future<void> bookBike({
-    required String stationId,
-    required String slotId,
-  }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 300));
-
-    final updatedStations = _store.stations.map((station) {
-      if (station.id != stationId) {
-        return station;
-      }
-
-      final slots = station.slots
-          .map(
-            (slot) =>
-                slot.id == slotId ? slot.copyWith(isAvailable: false) : slot,
-          )
-          .toList();
-
-      return station.copyWith(slots: slots);
-    }).toList();
-
-    _store.updateStations(updatedStations);
   }
 }

@@ -8,6 +8,7 @@ import 'data/repositories/user/app_user_repository.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/viewmodels/ride_app_view_model.dart';
 import 'ui/views/screens/app_shell_screen.dart';
+import 'ui/views/screens/splash_screen.dart';
 
 class RideRepositories {
   const RideRepositories({
@@ -29,9 +30,14 @@ Future<void> mainCommon({required RideRepositories repositories}) async {
 }
 
 class RideRentalApp extends StatelessWidget {
-  const RideRentalApp({super.key, required this.repositories});
+  const RideRentalApp({
+    super.key,
+    required this.repositories,
+    this.splashDuration = const Duration(seconds: 3),
+  });
 
   final RideRepositories repositories;
+  final Duration splashDuration;
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +54,11 @@ class RideRentalApp extends StatelessWidget {
       },
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'RideFlow',
+        title: 'BikeRental',
         theme: AppTheme.light(),
-        home: const AppShellScreen(),
+        home: splashDuration > Duration.zero
+            ? SplashScreen(duration: splashDuration)
+            : const AppShellScreen(),
       ),
     );
   }

@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import '../models/app_user.dart';
-import '../models/bike_slot.dart';
-import '../models/bike_station.dart';
+import '../../../models/app_user.dart';
+import '../../../models/bike_slot.dart';
+import '../../../models/bike_station.dart';
 
 class MockRideStore {
   MockRideStore() : stations = _seedStations();

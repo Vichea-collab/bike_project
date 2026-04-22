@@ -82,6 +82,7 @@ Future<void> _pumpApp(WidgetTester tester, {AppUser? currentUser}) async {
 
   await tester.pumpWidget(
     RideRentalApp(
+      splashDuration: Duration.zero,
       repositories: RideRepositories(
         bikeSlotRepository: _ImmediateBikeSlotRepository(store),
         ridePassRepository: const _ImmediateRidePassRepository(),
