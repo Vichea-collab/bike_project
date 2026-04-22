@@ -1,4 +1,4 @@
-import 'package:bike_project/data/mockup_data.dart';
+import 'package:bike_project/data/repositories/mock/mock_ride_store.dart';
 import 'package:bike_project/data/repositories/bike/bike_slot_repository.dart';
 import 'package:bike_project/data/repositories/pass/ride_pass_repository.dart';
 import 'package:bike_project/data/repositories/station/bike_station_repository.dart';
