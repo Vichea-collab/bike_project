@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../models/bike_station.dart';
+import '../../../../theme/app_design_tokens.dart';
+import '../../../widgets/app_icon_tile.dart';
+import '../../../widgets/app_state_view.dart';
 import '../../../widgets/custom_badge.dart';
 import '../../../widgets/custom_button.dart';
 import '../view_model/stations_view_model.dart';
@@ -41,34 +44,16 @@ class StationsContent extends StatelessWidget {
             station == null)
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                    color: Colors.black.withValues(alpha: 0.10),
-                  ),
-                ],
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                0,
+                AppSpacing.md,
+                AppSpacing.md,
               ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.search_off_rounded,
-                    color: Color(0xFFE46F2A),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'No stations match "${viewModel.searchQuery}".',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
+              child: AppStateView.empty(
+                title: 'No stations found',
+                message: 'No stations match "${viewModel.searchQuery}".',
               ),
             ),
           ),
@@ -77,17 +62,16 @@ class StationsContent extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: Container(
               constraints: const BoxConstraints(maxWidth: 720, maxHeight: 300),
-              margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              margin: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                0,
+                AppSpacing.md,
+                AppSpacing.md,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                    color: Colors.black.withValues(alpha: 0.12),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(AppRadius.sheet),
+                boxShadow: AppShadows.floating(alpha: 0.12),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -97,32 +81,23 @@ class StationsContent extends StatelessWidget {
                     width: 54,
                     height: 5,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE5DDD6),
-                      borderRadius: BorderRadius.circular(999),
+                      color: AppColors.handle,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+                      padding: const EdgeInsets.all(18),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 54,
-                                height: 54,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFE9DE),
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: const Icon(
-                                  Icons.location_on_rounded,
-                                  color: Color(0xFFE46F2A),
-                                ),
+                              const AppIconTile(
+                                icon: Icons.location_on_rounded,
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +106,7 @@ class StationsContent extends StatelessWidget {
                                       station.name,
                                       style: theme.textTheme.titleLarge,
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       station.address,
                                       style: theme.textTheme.bodyMedium,
@@ -141,10 +116,14 @@ class StationsContent extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Material(
-                                color: const Color(0xFFF7F2EC),
-                                borderRadius: BorderRadius.circular(14),
+                                color: AppColors.mutedSurface,
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.sm,
+                                ),
                                 child: InkWell(
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.sm,
+                                  ),
                                   onTap: viewModel.clearSelectedStation,
                                   child: const SizedBox(
                                     width: 40,
@@ -158,10 +137,10 @@ class StationsContent extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.lg),
                           Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.sm,
                             children: [
                               CustomBadge(
                                 text: '${station.availableBikes} bikes ready',
@@ -176,7 +155,7 @@ class StationsContent extends StatelessWidget {
                             'Open the bike list to choose a slot and continue booking.',
                             style: theme.textTheme.bodyMedium,
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: AppSpacing.md),
                           PrimaryButton(
                             onPressed: () => onOpenBikes(station),
                             text: 'View bikes',

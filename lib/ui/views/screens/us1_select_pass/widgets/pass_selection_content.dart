@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../theme/app_design_tokens.dart';
+import '../../../widgets/app_section_header.dart';
 import '../../../widgets/custom_badge.dart';
-import '../../../widgets/custom_button.dart';
-import '../../../widgets/section_card.dart';
 import '../view_model/pass_selection_view_model.dart';
 import 'pass_option_card.dart';
 
@@ -20,132 +20,95 @@ class PassSelectionContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final activePassType = viewModel.activePassType;
+    final activePass = viewModel.activePassType;
+    final hasActivePass = activePass != null;
+    final isSelectionMode = viewModel.selectionMode;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+      padding: AppSpacing.screenPadding,
       children: [
-        if (viewModel.selectionMode) ...[
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: CustomBadge(
-              text: 'Step 2',
-              backgroundColor: Color(0xFFF2ECE5),
-              textColor: Color(0xFF5B534D),
+        _buildHeader(hasActivePass, isSelectionMode),
+        const SizedBox(height: AppSpacing.xl),
+        if (hasActivePass && !isSelectionMode) ...[
+          PassOptionCard(
+            passType: activePass,
+            isActive: true,
+            onPressed: () {},
+          ),
+          const SizedBox(height: AppSpacing.md),
+          OutlinedButton.icon(
+            onPressed: onCancelPass,
+            icon: const Icon(Icons.close_rounded, size: 18),
+            label: const Text('Cancel subscription'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.red[700],
+              side: BorderSide(color: Colors.red[300]!),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.xl),
         ],
-        SectionCard(
-          backgroundColor: const Color(0xFFFFF4EC),
-          borderSide: const BorderSide(color: Color(0xFFF1DACA)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                viewModel.heroTitle,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: const Color(0xFF2C2521),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                viewModel.heroSubtitle,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: const Color(0xFF6B625B),
-                ),
-              ),
-            ],
+        if (!hasActivePass || isSelectionMode) ...[
+          Text(
+            isSelectionMode ? 'Choose a pass' : 'Available passes',
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
           ),
-        ),
-        const SizedBox(height: 18),
-        if (activePassType != null) ...[
-          SectionCard(
-            backgroundColor: const Color(0xFFFFEEE3),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            isSelectionMode
+                ? 'Select a pass to continue with your booking'
+                : 'Choose a pass to unlock unlimited rides',
+            style: const TextStyle(fontSize: 14, color: Color(0xFF655E58)),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          for (int i = 0; i < viewModel.passTypes.length; i++)
+            Column(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 54,
-                      height: 54,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE46F2A),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: const Icon(
-                        Icons.check_rounded,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${activePassType.title} active',
-                            style: theme.textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Expires ${viewModel.activePassExpirationLabel}.',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFF9C5429),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            viewModel.selectionMode
-                                ? 'Selecting a different pass will replace the current one for this booking.'
-                                : 'Your next booking can use this pass directly.',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFF9C5429),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                PassOptionCard(
+                  passType: viewModel.passTypes[i],
+                  isActive: false,
+                  onPressed: () => onSelectPass(i),
                 ),
-                if (!viewModel.selectionMode) ...[
-                  const SizedBox(height: 14),
-                  SecondaryButton(
-                    onPressed: onCancelPass,
-                    icon: Icons.close_rounded,
-                    text: 'Cancel subscription',
-                  ),
-                ],
+                const SizedBox(height: AppSpacing.md),
               ],
             ),
-          ),
-          const SizedBox(height: 18),
-        ],
-        Text(
-          viewModel.selectionMode
-              ? 'Step 2 options'
-              : 'Available subscriptions',
-          style: theme.textTheme.titleLarge,
-        ),
-        const SizedBox(height: 6),
-        Text(
-          viewModel.selectionMode
-              ? 'Choose a pass to continue directly to the success screen.'
-              : 'Choose one pass type to unlock repeated rentals.',
-          style: theme.textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 16),
-        for (var index = 0; index < viewModel.passTypes.length; index++) ...[
-          PassOptionCard(
-            passType: viewModel.passTypes[index],
-            isActive: activePassType == viewModel.passTypes[index],
-            onPressed: () => onSelectPass(index),
-          ),
-          const SizedBox(height: 14),
         ],
       ],
+    );
+  }
+
+  Widget _buildHeader(bool hasActivePass, bool isSelectionMode) {
+    return Container(
+      padding: AppSpacing.screenPadding,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF4EC),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        border: Border.all(color: const Color(0xFFF1DACA)),
+      ),
+      child: AppSectionHeader(
+        badge: isSelectionMode
+            ? const CustomBadge(
+                text: 'Step 2',
+                backgroundColor: Color(0xFFF2ECE5),
+                textColor: Color(0xFF2C2521),
+              )
+            : null,
+        title: isSelectionMode
+            ? 'Choose your pass access'
+            : 'Get unlimited rides',
+        subtitle: isSelectionMode
+            ? (hasActivePass
+                  ? 'You have an active pass. You can keep it or choose a different one.'
+                  : 'Pick a pass to continue with your reservation.')
+            : (hasActivePass
+                  ? 'Your pass is active and ready to use'
+                  : 'Choose a pass that fits your riding style'),
+        titleStyle: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w800,
+          color: Color(0xFF2C2521),
+        ),
+        subtitleStyle: const TextStyle(fontSize: 15, color: Color(0xFF6B625B)),
+      ),
     );
   }
 }

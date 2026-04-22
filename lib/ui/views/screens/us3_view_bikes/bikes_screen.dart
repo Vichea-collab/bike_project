@@ -16,6 +16,7 @@ class BikesScreen extends StatelessWidget {
     final appState = viewModel.state;
     final station = appState.selectedStation;
     final theme = Theme.of(context);
+    final bookingLocked = appState.hasCurrentBooking;
     final availableSlots =
         station?.slots.where((s) => s.isAvailable).toList() ?? [];
 
@@ -104,6 +105,35 @@ class BikesScreen extends StatelessWidget {
                     'Choose one bike to continue the booking flow.',
                     style: theme.textTheme.bodyMedium,
                   ),
+                  if (bookingLocked) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF3EA),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: const Color(0xFFF1D3BE)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.lock_outline_rounded,
+                            color: Color(0xFFE46F2A),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Complete your current ride before booking another bike.',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: const Color(0xFF7A5540),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 14),
                   if (availableSlots.isEmpty)
                     Container(
@@ -134,7 +164,11 @@ class BikesScreen extends StatelessWidget {
                     )
                   else
                     for (final slot in availableSlots) ...[
-                      BikeSlotTile(slot: slot, onTap: () => onBookBike(slot)),
+                      BikeSlotTile(
+                        slot: slot,
+                        onTap: () => onBookBike(slot),
+                        bookingLocked: bookingLocked,
+                      ),
                       const SizedBox(height: 12),
                     ],
                 ],

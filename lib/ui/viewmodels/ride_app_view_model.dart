@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../data/repositories/bike/bike_repository.dart';
-import '../../data/repositories/pass/pass_repository.dart';
-import '../../data/repositories/station/station_repository.dart';
-import '../../data/repositories/user/user_repository.dart';
+import '../../data/repositories/bike/bike_slot_repository.dart';
+import '../../data/repositories/pass/ride_pass_repository.dart';
+import '../../data/repositories/station/bike_station_repository.dart';
+import '../../data/repositories/user/app_user_repository.dart';
 import '../../models/app_user.dart';
 import '../../models/bike_station.dart';
 import '../state/ride_app_state.dart';
@@ -13,19 +13,19 @@ import '../utils/async_value.dart';
 
 class RideAppViewModel extends ChangeNotifier {
   RideAppViewModel({
-    required BikeRepository bikeRepository,
-    required PassRepository passRepository,
-    required StationRepository stationRepository,
-    required UserRepository userRepository,
-  }) : _bikeRepository = bikeRepository,
-       _passRepository = passRepository,
-       _stationRepository = stationRepository,
-       _userRepository = userRepository;
+    required BikeSlotRepository bikeSlotRepository,
+    required RidePassRepository ridePassRepository,
+    required BikeStationRepository bikeStationRepository,
+    required AppUserRepository appUserRepository,
+  }) : _bikeSlotRepository = bikeSlotRepository,
+       _ridePassRepository = ridePassRepository,
+       _bikeStationRepository = bikeStationRepository,
+       _appUserRepository = appUserRepository;
 
-  final BikeRepository _bikeRepository;
-  final PassRepository _passRepository;
-  final StationRepository _stationRepository;
-  final UserRepository _userRepository;
+  final BikeSlotRepository _bikeSlotRepository;
+  final RidePassRepository _ridePassRepository;
+  final BikeStationRepository _bikeStationRepository;
+  final AppUserRepository _appUserRepository;
   StreamSubscription<List<BikeStation>>? _stationsSubscription;
   RideAppState _state = const RideAppState();
 
@@ -35,14 +35,14 @@ class RideAppViewModel extends ChangeNotifier {
     try {
       _setState(_state.copyWith(status: const AsyncValue.loading()));
 
-      final loadedPassTypes = await _passRepository.fetchPassTypes();
-      final loadedStations = await _stationRepository.fetchStations();
-      var currentUser = await _userRepository.fetchCurrentUser();
+      final loadedPassTypes = await _ridePassRepository.fetchPassTypes();
+      final loadedStations = await _bikeStationRepository.fetchStations();
+      var currentUser = await _appUserRepository.fetchCurrentUser();
 
       if (currentUser.activePass != null &&
           !currentUser.activePass!.expirationDate.isAfter(DateTime.now())) {
         currentUser = currentUser.copyWith(activePass: null);
-        await _userRepository.saveCurrentUser(currentUser);
+        await _appUserRepository.saveCurrentUser(currentUser);
       }
 
       _setState(
@@ -93,7 +93,7 @@ class RideAppViewModel extends ChangeNotifier {
   }
 
   Future<void> saveUser(AppUser user) async {
-    await _userRepository.saveCurrentUser(user);
+    await _appUserRepository.saveCurrentUser(user);
     replaceCurrentUser(user, status: const AsyncValue.success(null));
   }
 
@@ -102,15 +102,15 @@ class RideAppViewModel extends ChangeNotifier {
     required String slotId,
     required AppUser updatedUser,
   }) async {
-    await _bikeRepository.bookBike(stationId: stationId, slotId: slotId);
-    await _userRepository.saveCurrentUser(updatedUser);
-    final refreshedStations = await _stationRepository.fetchStations();
+    await _bikeSlotRepository.bookBike(stationId: stationId, slotId: slotId);
+    await _appUserRepository.saveCurrentUser(updatedUser);
+    final refreshedStations = await _bikeStationRepository.fetchStations();
     applyStations(refreshedStations, updatedUser: updatedUser);
   }
 
   void _listenToStations() {
     _stationsSubscription?.cancel();
-    _stationsSubscription = _stationRepository.watchStations().listen(
+    _stationsSubscription = _bikeStationRepository.watchStations().listen(
       (stations) {
         applyStations(stations);
       },

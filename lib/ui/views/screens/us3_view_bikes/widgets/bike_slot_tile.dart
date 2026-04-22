@@ -1,20 +1,46 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../models/bike_slot.dart';
+import '../../../../theme/app_design_tokens.dart';
+import '../../../widgets/app_icon_tile.dart';
 import '../../../widgets/custom_button.dart';
 
 class BikeSlotTile extends StatelessWidget {
-  const BikeSlotTile({super.key, required this.slot, required this.onTap});
+  const BikeSlotTile({
+    super.key,
+    required this.slot,
+    required this.onTap,
+    this.bookingLocked = false,
+  });
 
   final BikeSlot slot;
   final VoidCallback? onTap;
+  final bool bookingLocked;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDisabled = bookingLocked || !slot.isAvailable;
+    final buttonText = bookingLocked
+        ? 'Complete ride first'
+        : slot.isAvailable
+        ? 'Book now'
+        : 'Unavailable';
+    final buttonColor = isDisabled
+        ? const Color(0xFFCFC8C1)
+        : const Color(0xFFFF7E3F);
+    final statusColor = slot.isAvailable
+        ? const Color(0xFF2F6A46)
+        : const Color(0xFF9A8E84);
+    final bikeIconColor = slot.isAvailable
+        ? const Color(0xFFE46F2A)
+        : const Color(0xFF9A8E84);
+    final bikeTileColor = slot.isAvailable
+        ? const Color(0xFFFFEFE4)
+        : const Color(0xFFF3EFEB);
 
     return InkWell(
-      onTap: onTap,
+      onTap: bookingLocked ? null : onTap,
       borderRadius: BorderRadius.circular(22),
       child: Ink(
         padding: const EdgeInsets.all(14),
@@ -36,24 +62,15 @@ class BikeSlotTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: slot.isAvailable
-                    ? const Color(0xFFFFEFE4)
-                    : const Color(0xFFF3EFEB),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Icon(
-                slot.isAvailable
-                    ? Icons.pedal_bike_rounded
-                    : Icons.block_rounded,
-                color: slot.isAvailable
-                    ? const Color(0xFFE46F2A)
-                    : const Color(0xFF9A8E84),
-                size: 30,
-              ),
+            AppIconTile(
+              icon: slot.isAvailable
+                  ? Icons.pedal_bike_rounded
+                  : Icons.block_rounded,
+              iconColor: bikeIconColor,
+              backgroundColor: bikeTileColor,
+              size: 64,
+              iconSize: 30,
+              borderRadius: AppRadius.lg,
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -73,9 +90,7 @@ class BikeSlotTile extends StatelessWidget {
                         width: 6,
                         height: 6,
                         decoration: BoxDecoration(
-                          color: slot.isAvailable
-                              ? const Color(0xFF2F6A46)
-                              : const Color(0xFF9A8E84),
+                          color: statusColor,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -93,13 +108,11 @@ class BikeSlotTile extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             PrimaryButton(
-              onPressed: onTap,
-              minimumSize: const Size(92, 44),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              backgroundColor: slot.isAvailable
-                  ? const Color(0xFFFF7E3F)
-                  : const Color(0xFFCFC8C1),
-              text: slot.isAvailable ? 'Book now' : 'Unavailable',
+              onPressed: bookingLocked ? null : onTap,
+              minimumSize: const Size(132, 44),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              backgroundColor: buttonColor,
+              text: buttonText,
             ),
           ],
         ),

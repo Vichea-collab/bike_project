@@ -19,7 +19,7 @@ class PassSelectionViewModel extends ChangeNotifier {
   List<PassType> get passTypes => _appViewModel.state.passTypes;
   PassType? get activePassType => _appViewModel.state.activePass?.type;
   bool get hasActivePass => _appViewModel.state.activePass != null;
-  String? get errorMessage => _appViewModel.state.status.errorMessage;
+  String? get errorMessage => _appViewModel.state.errorMessage;
   String? get activePassExpirationLabel {
     final activePass = _appViewModel.state.activePass;
     if (activePass == null) {

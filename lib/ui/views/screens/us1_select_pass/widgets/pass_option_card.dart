@@ -1,213 +1,236 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../models/pass_type.dart';
+import '../../../../theme/app_design_tokens.dart';
 import '../../../../utils/date_time_utils.dart';
+import '../../../widgets/app_icon_tile.dart';
 import '../../../widgets/custom_badge.dart';
 import '../../../widgets/custom_button.dart';
-import '../../../widgets/section_card.dart';
 
-class PassOptionCard extends StatelessWidget {
+class PassOptionCard extends StatefulWidget {
   const PassOptionCard({
     super.key,
     required this.passType,
     required this.isActive,
     required this.onPressed,
-    this.compact = false,
   });
 
   final PassType passType;
   final bool isActive;
   final VoidCallback onPressed;
-  final bool compact;
+
+  @override
+  State<PassOptionCard> createState() => _PassOptionCardState();
+}
+
+class _PassOptionCardState extends State<PassOptionCard> {
+  bool isHovering = false;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = passCardStyleFor(passType);
-    final daysLabel = passType.validityDays == 365
-        ? '1 year'
-        : '${passType.validityDays} days';
-    final expirationLabel = expirationLabelFor(passType);
-
-    return SectionCard(
-      padding: EdgeInsets.all(compact ? 18 : 20),
-      backgroundColor: style.background,
-      borderSide: BorderSide(color: style.borderColor),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: compact ? 40 : 46,
-                height: compact ? 40 : 46,
-                decoration: BoxDecoration(
-                  color: style.iconBackground,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(Icons.pedal_bike_rounded, color: style.iconColor),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  passType.title,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: style.titleColor,
-                  ),
-                ),
-              ),
-              CustomBadge(
-                text: isActive ? 'Active' : daysLabel,
-                backgroundColor: isActive ? style.activeBadge : style.badgeBackground,
-                textColor: isActive ? Colors.white : style.badgeText,
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Text(
-            isActive
-                ? '${passType.subtitle} Expires $expirationLabel.'
-                : passType.subtitle,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: style.subtitleColor,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFFCFA),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: style.softBorderColor),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.schedule_rounded, color: style.iconColor, size: 18),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    benefitLabelFor(passType),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF5C5550),
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovering = true),
+      onExit: (_) => setState(() => isHovering = false),
+      child: GestureDetector(
+        onTap: widget.onPressed,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          transform: (isHovering && !widget.isActive)
+              ? Matrix4.diagonal3Values(1.02, 1.02, 1)
+              : Matrix4.identity(),
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          decoration: BoxDecoration(
+            color: _getBackgroundColor(),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
+            border: Border.all(color: _getBorderColor(), width: 1.5),
+            boxShadow: isHovering && !widget.isActive
+                ? [
+                    BoxShadow(
+                      color: Colors.orange.withAlpha(40),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
-                ),
-              ],
+                  ]
+                : null,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: AppSpacing.md),
+              _buildDescription(),
+              const SizedBox(height: AppSpacing.md),
+              _buildBenefit(),
+              const SizedBox(height: AppSpacing.lg),
+              _buildFooter(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      children: [
+        AppIconTile(
+          icon: Icons.pedal_bike_rounded,
+          size: 46,
+          iconSize: 24,
+          backgroundColor: _getIconBackgroundColor(),
+          iconColor: _getIconColor(),
+          borderRadius: AppRadius.sm,
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Text(
+            widget.passType.title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: _getTitleColor(),
             ),
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Text(
-                passType.priceLabel,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: style.titleColor,
-                ),
-              ),
-              const Spacer(),
-              PrimaryButton(
-                backgroundColor: isActive
-                    ? const Color(0xFF2F2A27)
-                    : style.buttonColor,
-                minimumSize: Size(compact ? 96 : 108, 46),
-                onPressed: onPressed,
-                text: isActive ? 'Replace' : 'Select',
-              ),
-            ],
+        ),
+        if (widget.isActive)
+          const CustomBadge.success(
+            text: 'Active',
+            backgroundColor: AppColors.success,
+            textColor: Colors.white,
+          ),
+      ],
+    );
+  }
+
+  Widget _buildDescription() {
+    if (widget.isActive) {
+      return Text(
+        'Expires ${_getExpirationDate()}',
+        style: TextStyle(color: _getTextColor(), fontSize: 14),
+      );
+    }
+    return Text(
+      widget.passType.subtitle,
+      style: TextStyle(color: _getTextColor(), fontSize: 14),
+    );
+  }
+
+  Widget _buildBenefit() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: _getBenefitBackgroundColor(),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: _getBorderColor().withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.schedule_rounded, color: _getIconColor(), size: 18),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              _getBenefitText(),
+              style: TextStyle(color: _getTextColor(), fontSize: 13),
+            ),
           ),
         ],
       ),
     );
   }
-}
 
-String benefitLabelFor(PassType type) {
-  switch (type) {
-    case PassType.day:
-      return 'Unlimited short rides for 24 hours';
-    case PassType.monthly:
-      return 'Unlimited access for your monthly commute';
-    case PassType.annual:
-      return 'Best value for long-term daily riders';
+  Widget _buildFooter() {
+    return Row(
+      children: [
+        Text(
+          widget.passType.priceLabel,
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: _getPriceColor(),
+          ),
+        ),
+        const Spacer(),
+        if (!widget.isActive)
+          PrimaryButton(
+            onPressed: widget.onPressed,
+            text: 'Select',
+            backgroundColor: _getButtonColor(),
+            minimumSize: const Size(100, 46),
+          ),
+      ],
+    );
   }
-}
 
-String expirationLabelFor(PassType type) {
-  final expirationDate = DateTime.now().add(Duration(days: type.validityDays));
-  return formatDateLong(expirationDate);
-}
-
-PassCardStyle passCardStyleFor(PassType type) {
-  switch (type) {
-    case PassType.day:
-      return const PassCardStyle(
-        background: Color(0xFFF8D2BD),
-        titleColor: Color(0xFF6E2F10),
-        subtitleColor: Color(0xFF704A39),
-        badgeBackground: Color(0xFFFFEBD9),
-        badgeText: Color(0xFF914314),
-        activeBadge: Color(0xFFE46F2A),
-        buttonColor: Color(0xFFE46F2A),
-        iconBackground: Color(0xFFFFE9DE),
-        iconColor: Color(0xFFC85516),
-        borderColor: Color(0xFFF0BA99),
-        softBorderColor: Color(0xFFF3D8C8),
-      );
-    case PassType.monthly:
-      return const PassCardStyle(
-        background: Color(0xFFFFFCFA),
-        titleColor: Color(0xFF2A2725),
-        subtitleColor: Color(0xFF59534F),
-        badgeBackground: Color(0xFFF6EEE7),
-        badgeText: Color(0xFF6B5446),
-        activeBadge: Color(0xFFE46F2A),
-        buttonColor: Color(0xFFE46F2A),
-        iconBackground: Color(0xFFFFFFFF),
-        iconColor: Color(0xFF2E2A27),
-        borderColor: Color(0xFFE7D7CA),
-        softBorderColor: Color(0xFFECE2DA),
-      );
-    case PassType.annual:
-      return const PassCardStyle(
-        background: Color(0xFFFFFCFA),
-        titleColor: Color(0xFF2A2725),
-        subtitleColor: Color(0xFF59534F),
-        badgeBackground: Color(0xFFF6EEE7),
-        badgeText: Color(0xFF6B5446),
-        activeBadge: Color(0xFFE46F2A),
-        buttonColor: Color(0xFFE46F2A),
-        iconBackground: Color(0xFFFFFFFF),
-        iconColor: Color(0xFF2E2A27),
-        borderColor: Color(0xFFE7D7CA),
-        softBorderColor: Color(0xFFECE2DA),
-      );
+  Color _getBackgroundColor() {
+    if (widget.isActive) return const Color(0xFFE8F5E9);
+    if (isHovering) return const Color(0xFFFFF4EC);
+    return Colors.white;
   }
-}
 
-class PassCardStyle {
-  const PassCardStyle({
-    required this.background,
-    required this.titleColor,
-    required this.subtitleColor,
-    required this.badgeBackground,
-    required this.badgeText,
-    required this.activeBadge,
-    required this.buttonColor,
-    required this.iconBackground,
-    required this.iconColor,
-    required this.borderColor,
-    required this.softBorderColor,
-  });
+  Color _getBorderColor() {
+    if (widget.isActive) return const Color(0xFFA5D6A7);
+    if (isHovering) return AppColors.accent;
+    return AppColors.panelBorder;
+  }
 
-  final Color background;
-  final Color titleColor;
-  final Color subtitleColor;
-  final Color badgeBackground;
-  final Color badgeText;
-  final Color activeBadge;
-  final Color buttonColor;
-  final Color iconBackground;
-  final Color iconColor;
-  final Color borderColor;
-  final Color softBorderColor;
+  Color _getTitleColor() {
+    if (widget.isActive) return const Color(0xFF1B5E20);
+    if (isHovering) return const Color(0xFFE46F2A);
+    return const Color(0xFF2A2725);
+  }
+
+  Color _getTextColor() {
+    if (widget.isActive) return const Color(0xFF2E7D32);
+    if (isHovering) return const Color(0xFFE46F2A);
+    return const Color(0xFF59534F);
+  }
+
+  Color _getIconBackgroundColor() {
+    if (widget.isActive) return const Color(0xFFC8E6C9);
+    if (isHovering) return AppColors.iconSurface;
+    return AppColors.mutedSurface;
+  }
+
+  Color _getIconColor() {
+    if (widget.isActive) return const Color(0xFF1B5E20);
+    if (isHovering) return const Color(0xFFE46F2A);
+    return const Color(0xFF2E2A27);
+  }
+
+  Color _getBenefitBackgroundColor() {
+    if (widget.isActive) return const Color(0xFFC8E6C9);
+    if (isHovering) return AppColors.iconSurface;
+    return AppColors.softSurface;
+  }
+
+  Color _getPriceColor() {
+    if (widget.isActive) return const Color(0xFF1B5E20);
+    if (isHovering) return const Color(0xFFE46F2A);
+    return const Color(0xFF2A2725);
+  }
+
+  Color _getButtonColor() {
+    return AppColors.accent;
+  }
+
+  String _getExpirationDate() {
+    final date = DateTime.now().add(
+      Duration(days: widget.passType.validityDays),
+    );
+    return formatDateLong(date);
+  }
+
+  String _getBenefitText() {
+    switch (widget.passType) {
+      case PassType.day:
+        return 'Unlimited short rides for 24 hours';
+      case PassType.monthly:
+        return 'Unlimited access for your monthly commute';
+      case PassType.annual:
+        return 'Best value for long-term daily riders';
+    }
+  }
 }

@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../../../models/bike_station.dart';
+import '../../../../theme/app_design_tokens.dart';
+import '../../../widgets/app_icon_tile.dart';
 import '../../../widgets/custom_badge.dart';
 
 class StationMapPanel extends StatelessWidget {
@@ -46,19 +48,13 @@ class StationMapPanel extends StatelessWidget {
     final map = Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(fullScreen ? 0 : 30),
+        borderRadius: BorderRadius.circular(fullScreen ? 0 : AppRadius.sheet),
         boxShadow: fullScreen
             ? null
-            : [
-                BoxShadow(
-                  blurRadius: 22,
-                  offset: const Offset(0, 14),
-                  color: Colors.black.withValues(alpha: 0.07),
-                ),
-              ],
+            : AppShadows.floating(blurRadius: 22, offsetY: 14, alpha: 0.07),
       ),
       child: Padding(
-        padding: EdgeInsets.all(fullScreen ? 0 : 14),
+        padding: EdgeInsets.all(fullScreen ? 0 : AppSpacing.md),
         child: LayoutBuilder(
           builder: (context, constraints) {
             final reservedBottomSpace = showSelectedStationCard ? 150.0 : 70.0;
@@ -69,7 +65,9 @@ class StationMapPanel extends StatelessWidget {
               children: [
                 Positioned.fill(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(fullScreen ? 0 : 24),
+                    borderRadius: BorderRadius.circular(
+                      fullScreen ? 0 : AppRadius.xxl,
+                    ),
                     child: SizedBox(
                       width: mapWidth,
                       height: mapHeight,
@@ -102,9 +100,9 @@ class StationMapPanel extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: fullScreen ? 14 : 8,
-                  left: fullScreen ? 14 : 8,
-                  right: fullScreen ? 14 : 8,
+                  top: fullScreen ? AppSpacing.md : AppSpacing.sm,
+                  left: fullScreen ? AppSpacing.md : AppSpacing.sm,
+                  right: fullScreen ? AppSpacing.md : AppSpacing.sm,
                   child: Row(
                     children: [
                       Expanded(
@@ -112,14 +110,12 @@ class StationMapPanel extends StatelessWidget {
                           height: 46,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 14,
-                                offset: const Offset(0, 6),
-                                color: Colors.black.withValues(alpha: 0.05),
-                              ),
-                            ],
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            boxShadow: AppShadows.floating(
+                              blurRadius: 14,
+                              offsetY: 6,
+                              alpha: 0.05,
+                            ),
                           ),
                           child: TextField(
                             controller: searchController,
@@ -145,7 +141,7 @@ class StationMapPanel extends StatelessWidget {
                                     ),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 14,
+                                horizontal: AppSpacing.md,
                                 vertical: 11,
                               ),
                             ),
@@ -164,31 +160,22 @@ class StationMapPanel extends StatelessWidget {
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 18,
-                            offset: const Offset(0, 10),
-                            color: Colors.black.withValues(alpha: 0.08),
-                          ),
-                        ],
+                        borderRadius: BorderRadius.circular(AppRadius.xxl),
+                        boxShadow: AppShadows.floating(
+                          blurRadius: 18,
+                          offsetY: 10,
+                          alpha: 0.08,
+                        ),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFE9DE),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: const Icon(
-                              Icons.pedal_bike_rounded,
-                              color: Color(0xFFE46F2A),
-                            ),
+                          const AppIconTile(
+                            icon: Icons.pedal_bike_rounded,
+                            size: 52,
+                            borderRadius: AppRadius.lg,
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppSpacing.md),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,14 +189,15 @@ class StationMapPanel extends StatelessWidget {
                                   selectedStation.address,
                                   style: theme.textTheme.bodyMedium,
                                 ),
-                                const SizedBox(height: 12),
-                                Row(
+                                const SizedBox(height: AppSpacing.md),
+                                Wrap(
+                                  spacing: AppSpacing.sm,
+                                  runSpacing: AppSpacing.sm,
                                   children: [
                                     CustomBadge(
                                       text:
                                           '${selectedStation.availableBikes} bikes ready',
                                     ),
-                                    const SizedBox(width: 8),
                                     CustomBadge(
                                       text:
                                           '${selectedStation.totalSlots} total slots',

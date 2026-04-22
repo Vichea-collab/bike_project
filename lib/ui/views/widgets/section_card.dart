@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_design_tokens.dart';
+
 class SectionCard extends StatelessWidget {
   const SectionCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(20),
+    this.padding = AppSpacing.screenPadding,
     this.backgroundColor,
-    this.borderRadius = 24,
+    this.borderRadius = AppRadius.xxl,
     this.borderSide = BorderSide.none,
   });
 
