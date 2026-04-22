@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../../../models/bike_slot.dart';
 import '../../../../../models/bike_station.dart';
 import '../../../../viewmodels/ride_app_view_model.dart';
 
@@ -37,7 +36,6 @@ class StationsViewModel extends ChangeNotifier {
 
   String get searchQuery => _searchQuery;
   bool get hasSearchQuery => _searchQuery.trim().isNotEmpty;
-  bool get hasActivePass => _appViewModel.state.hasActivePass;
 
   void selectStation(String stationId) {
     _appViewModel.selectStation(stationId);
@@ -46,8 +44,6 @@ class StationsViewModel extends ChangeNotifier {
   void clearSelectedStation() {
     _appViewModel.clearSelectedStation();
   }
-
-  List<BikeSlot> get slots => selectedStation?.slots ?? const [];
 
   void updateSearchQuery(String value) {
     _searchQuery = value;

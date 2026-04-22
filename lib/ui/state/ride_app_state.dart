@@ -29,34 +29,8 @@ class RideAppState {
   CurrentBooking? get currentBooking => currentUser?.currentBooking;
   bool get hasCurrentBooking => currentBooking != null;
 
-  int get totalAvailableBikes =>
-      stations.fold(0, (total, station) => total + station.availableBikes);
-
-  int get stationsWithBikes =>
-      stations.where((station) => station.availableBikes > 0).length;
-
-  BikeStation? get highlightedStation {
-    if (selectedStation != null) {
-      return selectedStation;
-    }
-    if (stations.isEmpty) {
-      return null;
-    }
-    return stations.reduce(
-      (best, current) =>
-          current.availableBikes > best.availableBikes ? current : best,
-    );
-  }
-
   bool get hasActivePass =>
       activePass != null && activePass!.expirationDate.isAfter(DateTime.now());
-
-  String get accessLabel {
-    if (hasActivePass) {
-      return '${activePass!.type.title} active';
-    }
-    return 'No active access';
-  }
 
   RideAppState copyWith({
     AsyncValue<void>? status,

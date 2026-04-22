@@ -31,7 +31,6 @@ class StationsContent extends StatelessWidget {
             stations: viewModel.filteredStations,
             selectedStationId: station?.id,
             onSelect: viewModel.selectStation,
-            accessLabel: viewModel.hasActivePass ? 'Pass active' : 'Buy ticket',
             searchController: viewModel.searchController,
             onSearchChanged: viewModel.updateSearchQuery,
             onClearSearch: viewModel.clearSearch,

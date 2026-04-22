@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_design_tokens.dart';
 
-enum CustomBadgeTone { neutral, accent, success, warning }
+enum CustomBadgeTone { neutral, success, warning }
 
 class CustomBadge extends StatelessWidget {
   const CustomBadge({
@@ -12,13 +12,6 @@ class CustomBadge extends StatelessWidget {
     this.textColor,
     this.tone = CustomBadgeTone.neutral,
   });
-
-  const CustomBadge.accent({
-    super.key,
-    required this.text,
-    this.backgroundColor,
-    this.textColor,
-  }) : tone = CustomBadgeTone.accent;
 
   const CustomBadge.success({
     super.key,
@@ -42,7 +35,6 @@ class CustomBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final palette = _resolvePalette();
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -50,48 +42,28 @@ class CustomBadge extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: backgroundColor ?? palette.backgroundColor,
+        color: backgroundColor ?? _backgroundColor,
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
         text,
         style: theme.textTheme.labelMedium?.copyWith(
-          color: textColor ?? palette.textColor,
+          color: textColor ?? _textColor,
           fontWeight: FontWeight.w700,
         ),
       ),
     );
   }
 
-  _BadgePalette _resolvePalette() {
-    switch (tone) {
-      case CustomBadgeTone.neutral:
-        return const _BadgePalette(
-          backgroundColor: AppColors.mutedSurface,
-          textColor: Color(0xFF645C55),
-        );
-      case CustomBadgeTone.accent:
-        return const _BadgePalette(
-          backgroundColor: AppColors.warningSurface,
-          textColor: AppColors.warning,
-        );
-      case CustomBadgeTone.success:
-        return const _BadgePalette(
-          backgroundColor: AppColors.successSurface,
-          textColor: AppColors.success,
-        );
-      case CustomBadgeTone.warning:
-        return const _BadgePalette(
-          backgroundColor: AppColors.warningSurface,
-          textColor: AppColors.warning,
-        );
-    }
-  }
-}
+  Color get _backgroundColor => switch (tone) {
+    CustomBadgeTone.neutral => AppColors.mutedSurface,
+    CustomBadgeTone.success => AppColors.successSurface,
+    CustomBadgeTone.warning => AppColors.warningSurface,
+  };
 
-class _BadgePalette {
-  const _BadgePalette({required this.backgroundColor, required this.textColor});
-
-  final Color backgroundColor;
-  final Color textColor;
+  Color get _textColor => switch (tone) {
+    CustomBadgeTone.neutral => const Color(0xFF645C55),
+    CustomBadgeTone.success => AppColors.success,
+    CustomBadgeTone.warning => AppColors.warning,
+  };
 }

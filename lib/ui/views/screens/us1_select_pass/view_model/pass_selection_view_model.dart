@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import '../../../../viewmodels/ride_app_view_model.dart';
 import '../../../../../models/pass_type.dart';
 import '../../../../../models/ride_pass.dart';
-import '../../../../utils/date_time_utils.dart';
 
 class PassSelectionViewModel extends ChangeNotifier {
   PassSelectionViewModel({
@@ -20,29 +19,6 @@ class PassSelectionViewModel extends ChangeNotifier {
   PassType? get activePassType => _appViewModel.state.activePass?.type;
   bool get hasActivePass => _appViewModel.state.activePass != null;
   String? get errorMessage => _appViewModel.state.errorMessage;
-  String? get activePassExpirationLabel {
-    final activePass = _appViewModel.state.activePass;
-    if (activePass == null) {
-      return null;
-    }
-    return formatDateLong(activePass.expirationDate);
-  }
-
-  String get heroTitle =>
-      selectionMode ? 'Choose pass access' : 'Choose the pass that fits you';
-
-  String get heroSubtitle {
-    final activePass = _appViewModel.state.activePass;
-    if (activePass == null) {
-      return selectionMode
-          ? 'Pick one pass to continue this reservation. Buying a new pass replaces the current one.'
-          : 'Pick one active pass. Buying a new pass replaces the current one.';
-    }
-
-    return selectionMode
-        ? '${activePass.type.title} is active until ${formatDateLong(activePass.expirationDate)}. You can keep it or replace it for this booking.'
-        : '${activePass.type.title} is active until ${formatDateLong(activePass.expirationDate)}.';
-  }
 
   Future<bool> activatePass(PassType passType) async {
     final currentUser = _appViewModel.state.currentUser;

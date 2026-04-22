@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../../../models/bike_slot.dart';
+import '../../../../../models/bike_station.dart';
 import '../../../../../models/current_booking.dart';
 import '../../../../utils/date_time_utils.dart';
 import '../../../../utils/async_value.dart';
@@ -25,16 +26,11 @@ class BookingViewModel extends ChangeNotifier {
   bool get hasActivePass => _appViewModel.state.hasActivePass;
   bool get canConfirm => hasActivePass;
 
-  String get accessTitle {
-    if (hasActivePass) {
-      return 'Active pass';
-    }
-    return 'Choose access';
-  }
+  String get accessTitle => hasActivePass ? 'Active pass' : 'Choose access';
 
   String get accessDescription {
+    final pass = _appViewModel.state.activePass;
     if (hasActivePass) {
-      final pass = _appViewModel.state.activePass;
       if (pass == null) {
         return 'Ride access is active for this booking.';
       }
@@ -91,7 +87,7 @@ class BookingViewModel extends ChangeNotifier {
     }
   }
 
-  CurrentBooking _buildCurrentBooking(dynamic station) {
+  CurrentBooking _buildCurrentBooking(BikeStation station) {
     return CurrentBooking(
       stationId: station.id,
       stationName: station.name,

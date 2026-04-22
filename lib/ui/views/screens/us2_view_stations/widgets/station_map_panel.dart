@@ -16,7 +16,6 @@ class StationMapPanel extends StatelessWidget {
     required this.searchController,
     required this.onSearchChanged,
     required this.onClearSearch,
-    this.accessLabel,
     this.fullScreen = false,
     this.showSelectedStationCard = true,
   });
@@ -27,7 +26,6 @@ class StationMapPanel extends StatelessWidget {
   final TextEditingController searchController;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onClearSearch;
-  final String? accessLabel;
   final bool fullScreen;
   final bool showSelectedStationCard;
 

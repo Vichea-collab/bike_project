@@ -13,10 +13,6 @@ const _months = [
   'Dec',
 ];
 
-String formatDateShort(DateTime date) {
-  return '${_months[date.month - 1]} ${date.day}';
-}
-
 String formatDateLong(DateTime date) {
   return '${_months[date.month - 1]} ${date.day}, ${date.year}';
 }

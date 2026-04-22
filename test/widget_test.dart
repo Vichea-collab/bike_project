@@ -84,7 +84,7 @@ Future<void> _pumpApp(WidgetTester tester, {AppUser? currentUser}) async {
     RideRentalApp(
       splashDuration: Duration.zero,
       repositories: RideRepositories(
-        bikeSlotRepository: _ImmediateBikeSlotRepository(store),
+        bikeSlotRepository: const _ImmediateBikeSlotRepository(),
         ridePassRepository: const _ImmediateRidePassRepository(),
         bikeStationRepository: _ImmediateBikeStationRepository(store),
         appUserRepository: _ImmediateAppUserRepository(store),
@@ -118,9 +118,7 @@ class _ImmediateBikeStationRepository implements BikeStationRepository {
 }
 
 class _ImmediateBikeSlotRepository implements BikeSlotRepository {
-  const _ImmediateBikeSlotRepository(this.store);
-
-  final MockRideStore store;
+  const _ImmediateBikeSlotRepository();
 
   @override
   Future<void> bookBike({
