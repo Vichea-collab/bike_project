@@ -7,13 +7,13 @@ import '../../../models/bike_station.dart';
 import '../../dtos/bike_station_dto.dart';
 import '../../mockup_data.dart';
 
-abstract class StationRepository {
+abstract class BikeStationRepository {
   Future<List<BikeStation>> fetchStations();
   Stream<List<BikeStation>> watchStations();
 }
 
-class StationRestRepository implements StationRepository {
-  StationRestRepository({required String databaseUrl, http.Client? client})
+class BikeStationRestRepository implements BikeStationRepository {
+  BikeStationRestRepository({required String databaseUrl, http.Client? client})
     : databaseUrl = databaseUrl.replaceFirst(RegExp(r'/$'), ''),
       _client = client ?? http.Client();
 
@@ -63,8 +63,9 @@ class StationRestRepository implements StationRepository {
   }
 }
 
-class StationMockRepository implements StationRepository {
-  const StationMockRepository({required MockRideStore store}) : _store = store;
+class BikeStationMockRepository implements BikeStationRepository {
+  const BikeStationMockRepository({required MockRideStore store})
+    : _store = store;
 
   final MockRideStore _store;
 

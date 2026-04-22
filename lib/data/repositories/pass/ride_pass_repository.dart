@@ -1,18 +1,18 @@
 import '../../../models/pass_type.dart';
 
-abstract class PassRepository {
+abstract class RidePassRepository {
   Future<List<PassType>> fetchPassTypes();
 }
 
-class PassRestRepository implements PassRepository {
-  const PassRestRepository();
+class RidePassRestRepository implements RidePassRepository {
+  const RidePassRestRepository();
 
   @override
   Future<List<PassType>> fetchPassTypes() async => PassType.values;
 }
 
-class PassMockRepository implements PassRepository {
-  const PassMockRepository();
+class RidePassMockRepository implements RidePassRepository {
+  const RidePassMockRepository();
 
   @override
   Future<List<PassType>> fetchPassTypes() async {

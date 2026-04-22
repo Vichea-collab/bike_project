@@ -4,12 +4,12 @@ import 'package:http/http.dart' as http;
 
 import '../../mockup_data.dart';
 
-abstract class BikeRepository {
+abstract class BikeSlotRepository {
   Future<void> bookBike({required String stationId, required String slotId});
 }
 
-class BikeRestRepository implements BikeRepository {
-  BikeRestRepository({required String databaseUrl, http.Client? client})
+class BikeSlotRestRepository implements BikeSlotRepository {
+  BikeSlotRestRepository({required String databaseUrl, http.Client? client})
     : databaseUrl = databaseUrl.replaceFirst(RegExp(r'/$'), ''),
       _client = client ?? http.Client();
 
@@ -66,8 +66,8 @@ class BikeRestRepository implements BikeRepository {
   }
 }
 
-class BikeMockRepository implements BikeRepository {
-  const BikeMockRepository({required MockRideStore store}) : _store = store;
+class BikeSlotMockRepository implements BikeSlotRepository {
+  const BikeSlotMockRepository({required MockRideStore store}) : _store = store;
 
   final MockRideStore _store;
 

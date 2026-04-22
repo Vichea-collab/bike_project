@@ -1,7 +1,7 @@
-import 'data/repositories/bike/bike_repository.dart';
-import 'data/repositories/pass/pass_repository.dart';
-import 'data/repositories/station/station_repository.dart';
-import 'data/repositories/user/user_repository.dart';
+import 'data/repositories/bike/bike_slot_repository.dart';
+import 'data/repositories/pass/ride_pass_repository.dart';
+import 'data/repositories/station/bike_station_repository.dart';
+import 'data/repositories/user/app_user_repository.dart';
 import 'main_common.dart';
 
 Future<void> main() async {
@@ -10,10 +10,10 @@ Future<void> main() async {
 
   await mainCommon(
     repositories: RideRepositories(
-      bikeRepository: BikeRestRepository(databaseUrl: databaseUrl),
-      passRepository: const PassRestRepository(),
-      stationRepository: StationRestRepository(databaseUrl: databaseUrl),
-      userRepository: UserRestRepository(databaseUrl: databaseUrl),
+      bikeSlotRepository: BikeSlotRestRepository(databaseUrl: databaseUrl),
+      ridePassRepository: const RidePassRestRepository(),
+      bikeStationRepository: BikeStationRestRepository(databaseUrl: databaseUrl),
+      appUserRepository: AppUserRestRepository(databaseUrl: databaseUrl),
     ),
   );
 }

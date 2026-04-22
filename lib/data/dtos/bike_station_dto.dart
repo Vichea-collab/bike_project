@@ -19,32 +19,13 @@ class BikeStationDto {
   final List<BikeSlotDto> slots;
 
   factory BikeStationDto.fromMap(String id, Map<Object?, Object?> map) {
-    final rawSlots = map['slots'];
-    final slots = <BikeSlotDto>[];
-
-    if (rawSlots is Map) {
-      for (final entry in rawSlots.entries) {
-        final value = entry.value;
-        if (value is Map<Object?, Object?>) {
-          slots.add(BikeSlotDto.fromMap(entry.key.toString(), value));
-        }
-      }
-    } else if (rawSlots is List) {
-      for (final item in rawSlots) {
-        if (item is Map<Object?, Object?>) {
-          final slotId = (item['id'] ?? item['label'] ?? 'slot').toString();
-          slots.add(BikeSlotDto.fromMap(slotId, item));
-        }
-      }
-    }
-
     return BikeStationDto(
       id: id,
       name: (map['name'] ?? '').toString(),
       address: (map['address'] ?? '').toString(),
-      mapX: toDoubleValue(map['mapX']),
-      mapY: toDoubleValue(map['mapY']),
-      slots: slots,
+      mapX: _toDoubleValue(map['mapX']),
+      mapY: _toDoubleValue(map['mapY']),
+      slots: _parseSlots(map['slots']),
     );
   }
 
@@ -71,7 +52,32 @@ class BikeStationDto {
   }
 }
 
-double toDoubleValue(Object? value) {
+List<BikeSlotDto> _parseSlots(Object? rawSlots) {
+  final slots = <BikeSlotDto>[];
+
+  if (rawSlots is Map) {
+    for (final entry in rawSlots.entries) {
+      final value = entry.value;
+      if (value is Map<Object?, Object?>) {
+        slots.add(BikeSlotDto.fromMap(entry.key.toString(), value));
+      }
+    }
+    return slots;
+  }
+
+  if (rawSlots is List) {
+    for (final item in rawSlots) {
+      if (item is Map<Object?, Object?>) {
+        final slotId = (item['id'] ?? item['label'] ?? 'slot').toString();
+        slots.add(BikeSlotDto.fromMap(slotId, item));
+      }
+    }
+  }
+
+  return slots;
+}
+
+double _toDoubleValue(Object? value) {
   if (value is num) {
     return value.toDouble();
   }

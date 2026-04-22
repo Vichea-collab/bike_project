@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'data/repositories/bike/bike_repository.dart';
-import 'data/repositories/pass/pass_repository.dart';
-import 'data/repositories/station/station_repository.dart';
-import 'data/repositories/user/user_repository.dart';
+import 'data/repositories/bike/bike_slot_repository.dart';
+import 'data/repositories/pass/ride_pass_repository.dart';
+import 'data/repositories/station/bike_station_repository.dart';
+import 'data/repositories/user/app_user_repository.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/viewmodels/ride_app_view_model.dart';
 import 'ui/views/screens/app_shell_screen.dart';
 
 class RideRepositories {
   const RideRepositories({
-    required this.bikeRepository,
-    required this.passRepository,
-    required this.stationRepository,
-    required this.userRepository,
+    required this.bikeSlotRepository,
+    required this.ridePassRepository,
+    required this.bikeStationRepository,
+    required this.appUserRepository,
   });
 
-  final BikeRepository bikeRepository;
-  final PassRepository passRepository;
-  final StationRepository stationRepository;
-  final UserRepository userRepository;
+  final BikeSlotRepository bikeSlotRepository;
+  final RidePassRepository ridePassRepository;
+  final BikeStationRepository bikeStationRepository;
+  final AppUserRepository appUserRepository;
 }
 
 Future<void> mainCommon({required RideRepositories repositories}) async {
@@ -38,10 +38,10 @@ class RideRentalApp extends StatelessWidget {
     return ChangeNotifierProvider<RideAppViewModel>(
       create: (_) {
         final viewModel = RideAppViewModel(
-          bikeRepository: repositories.bikeRepository,
-          passRepository: repositories.passRepository,
-          stationRepository: repositories.stationRepository,
-          userRepository: repositories.userRepository,
+          bikeSlotRepository: repositories.bikeSlotRepository,
+          ridePassRepository: repositories.ridePassRepository,
+          bikeStationRepository: repositories.bikeStationRepository,
+          appUserRepository: repositories.appUserRepository,
         );
         viewModel.initialize();
         return viewModel;

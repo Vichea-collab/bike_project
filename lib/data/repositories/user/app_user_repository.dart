@@ -6,13 +6,13 @@ import '../../../models/app_user.dart';
 import '../../dtos/app_user_dto.dart';
 import '../../mockup_data.dart';
 
-abstract class UserRepository {
+abstract class AppUserRepository {
   Future<AppUser> fetchCurrentUser();
   Future<void> saveCurrentUser(AppUser user);
 }
 
-class UserRestRepository implements UserRepository {
-  UserRestRepository({required String databaseUrl, http.Client? client})
+class AppUserRestRepository implements AppUserRepository {
+  AppUserRestRepository({required String databaseUrl, http.Client? client})
     : databaseUrl = databaseUrl.replaceFirst(RegExp(r'/$'), ''),
       _client = client ?? http.Client();
 
@@ -57,8 +57,8 @@ class UserRestRepository implements UserRepository {
   }
 }
 
-class UserMockRepository implements UserRepository {
-  const UserMockRepository({required MockRideStore store}) : _store = store;
+class AppUserMockRepository implements AppUserRepository {
+  const AppUserMockRepository({required MockRideStore store}) : _store = store;
 
   final MockRideStore _store;
 

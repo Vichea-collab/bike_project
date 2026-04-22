@@ -1,5 +1,6 @@
 import '../../models/app_user.dart';
 import '../../models/bike_station.dart';
+import '../../models/current_booking.dart';
 import '../../models/pass_type.dart';
 import '../../models/ride_pass.dart';
 import '../utils/async_value.dart';
@@ -25,6 +26,8 @@ class RideAppState {
   String? get errorMessage => status.errorMessage;
 
   RidePass? get activePass => currentUser?.activePass;
+  CurrentBooking? get currentBooking => currentUser?.currentBooking;
+  bool get hasCurrentBooking => currentBooking != null;
 
   int get totalAvailableBikes =>
       stations.fold(0, (total, station) => total + station.availableBikes);
